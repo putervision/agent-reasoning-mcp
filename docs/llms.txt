@@ -1,0 +1,27 @@
+# @putervision/agent-reasoning-mcp
+
+> Strategic BDI Reasoning & Decision Intelligence for Autonomous AI Agents
+
+`@putervision/agent-reasoning-mcp` implements belief-desire-intention (BDI) cognitive architecture for autonomous AI agents. It provides goal hierarchy decomposition, multi-attribute expected utility calculation ($E[U] = \sum w_i u_i$), exponential belief decay ($\lambda = 0.05/\text{hr}$), quantitative risk evaluation, reactive replanning upon obstacles, and an intention queue wire contract for runtime execution.
+
+## Core Capabilities
+- **Hierarchical Goal DAGs**: Create objectives, decompose into sub-goals, propagate progress, and verify acceptance criteria.
+- **Belief State Revision**: Exponential confidence decay $C(t) = C_0 \cdot e^{-\lambda t}$, TTL sweeps, and category indexing.
+- **Multi-Attribute Utility Theory**: Dynamic weighting for aggression, caution, greed, exploration, and efficiency.
+- **Quantitative Risk Analysis**: Threat-opportunity scoring and safety mitigation generation.
+- **Reactive Replanning**: Auto-aborts invalidated intentions and generates contingency DAGs when blockers arise.
+- **Cryptographic Audit Ledger**: Unbroken SHA-256 Merkle hash chain tracking all cognitive events.
+
+## 10 Consolidated MCP Tools
+1. `set_goal`: Register, update, decompose, get, list, or abandon hierarchical goals.
+2. `evaluate_situation`: Process multi-modal situation snapshot and output ranked recommendations.
+3. `replan`: Adaptively reconstruct subgoals upon blockers or unexpected events.
+4. `assess_risk`: Quantitative threat and risk calculation for candidate actions.
+5. `query_knowledge`: Search learned heuristics and past decision patterns.
+6. `set_utility_weights`: Configure utility scoring weights.
+7. `get_decision_trace`: Explainable step-by-step chain-of-thought rationale playback.
+8. `manage_beliefs`: Structured belief state with exponential confidence decay.
+9. `manage_intentions`: Queue, dispatch, track, and resolve behavior directives for runtime.
+10. `manage_reasoning_db`: Snapshots, diagnostics, and SHA-256 Merkle audit verification.
+
+*Non-claims statement: Functional agency and closed-loop automation — not consciousness, sentience, or AGI.*

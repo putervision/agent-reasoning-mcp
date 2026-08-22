@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agent Reasoning MCP Visualizer</title>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #f9fafb; display: flex; height: 100vh; overflow: hidden; }
+    #sidebar { width: 320px; border-right: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    #main { flex: 1; padding: 2rem; overflow-y: auto; }
+    .card { background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.25rem; margin-top: 0; color: #06b6d4; }
+    .trace-item { padding: 0.75rem; border-left: 2px solid #06b6d4; background: rgba(255,255,255,0.02); margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h2>Goal DAG Inspector</h2>
+    <div style="font-size: 0.9rem; color: #9ca3af;">Interactive Goal Hierarchy & Decision Trace Playback</div>
+    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); width: 100%;">
+    <div>
+      <strong>Active Profile:</strong> Balanced
+    </div>
+    <div>
+      <strong>Beliefs Tracked:</strong> 12
+    </div>
+  </div>
+  <div id="main">
+    <div class="card">
+      <h2>Active Decision Traces</h2>
+      <div id="traces">
+        <div class="trace-item">
+          <strong>Decision: Engage Enemy Camp</strong> (Latency: 14ms)<br>
+          <span style="color: #9ca3af; font-size: 0.85rem;">Chain: Analyzed situation -> Evaluated utilities -> Selected highest score (0.84)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

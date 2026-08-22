@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Reasoning MCP — Strategic BDI Cognitive Engine for AI Agents</title>
+  <meta name="description" content="Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, utility scoring, risk evaluation, and reactive replanning.">
+  <meta name="keywords" content="mcp, model-context-protocol, reasoning, bdi-agent, goal-planning, utility-theory, ai-agents, putervision, sqlite">
+  <meta property="og:title" content="Agent Reasoning MCP — PuterVision">
+  <meta property="og:description" content="Strategic BDI reasoning engine for autonomous AI agents.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "agent-reasoning-mcp",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Cross-platform",
+    "offers": { "@type": "Offer", "price": "0" },
+    "description": "Strategic BDI reasoning engine for autonomous AI agents."
+  }
+  </script>
+</head>
+<body>
+  <div class="glow-backdrop"></div>
+  <header>
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;">
+      <div style="font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.5rem;">
+        <span style="color: var(--accent-cyan);">PuterVision</span> / agent-reasoning-mcp
+      </div>
+      <nav style="display: flex; gap: 1.5rem; font-size: 0.9rem;">
+        <a href="#simulator" style="color: var(--text-secondary); text-decoration: none;">Simulator</a>
+        <a href="#tools" style="color: var(--text-secondary); text-decoration: none;">Tools</a>
+        <a href="#architecture" style="color: var(--text-secondary); text-decoration: none;">Architecture</a>
+        <a href="https://github.com/putervision/agent-reasoning-mcp" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">GitHub →</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: 0 auto; padding: 3rem 2rem;">
+    <!-- Hero -->
+    <section style="text-align: center; margin-bottom: 4rem;">
+      <div style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent-cyan); font-size: 0.85rem; margin-bottom: 1rem;">
+        Model Context Protocol Server • v0.1.0
+      </div>
+      <h1 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; background: linear-gradient(135deg, #fff 0%, #9ca3af 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Strategic BDI Reasoning & Decision Intelligence
+      </h1>
+      <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 800px; margin: 0 auto 2rem;">
+        Hierarchical goal decomposition, multi-attribute expected utility theory (\(E[U] = \sum w_i u_i\)), exponential belief decay, and reactive replanning for autonomous agents.
+      </p>
+      <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem 1.5rem; display: inline-flex; align-items: center; gap: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">
+        <code>npx @putervision/agent-reasoning-mcp init</code>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem; font-style: italic;">
+        *Functional agency and closed-loop automation — not consciousness, sentience, or AGI.*
+      </p>
+    </section>
+
+    <!-- Interactive Utility Weight Simulator -->
+    <section id="simulator" style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 4rem;">
+      <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        ⚡ Interactive Utility Weight Simulator
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+        Adjust the agent's utility scoring profile sliders to observe real-time dynamic action ranking and risk assessment.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.25rem;">
+              <span>Aggression</span> <span id="val-agg">0.50</span>
+            </label>
+            <input type="range" id="slider-agg" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.25rem;">
+              <span>Caution</span> <span id="val-caut">0.50</span>
+            </label>
+            <input type="range" id="slider-caut" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.25rem;">
+              <span>Greed</span> <span id="val-greed">0.50</span>
+            </label>
+            <input type="range" id="slider-greed" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.25rem;">
+              <span>Exploration</span> <span id="val-exp">0.50</span>
+            </label>
+            <input type="range" id="slider-exp" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
+          </div>
+        </div>
+        <div style="background: rgba(0, 0, 0, 0.4); border-radius: 8px; padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.05);">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent-cyan);">Ranked Candidate Actions</h3>
+          <div id="ranked-list" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 Tools Explorer -->
+    <section id="tools" style="margin-bottom: 4rem;">
+      <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem;">🛠️ Consolidated MCP Tools (10 Tools)</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">set_goal</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Manage hierarchical objectives, decompose into sub-goals, and propagate progress.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">evaluate_situation</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Score environment snapshots against active utility weights and recommend top actions.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">replan</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Adaptively regenerate goal DAGs and abort invalidated intentions upon blockers.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">assess_risk</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Quantitative threat and risk calculation for candidate actions.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">query_knowledge</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Search learned heuristics, tactics, and past decision patterns.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">set_utility_weights</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Configure multi-attribute utility profiles (aggression, caution, greed, exploration).</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">get_decision_trace</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Explainable chain-of-thought rationale playback and latency stats.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">manage_beliefs</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Maintain structured beliefs with exponential confidence decay and TTL sweeps.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">manage_intentions</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Queue, dispatch, and track behavior directives for runtime execution.</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+          <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">manage_reasoning_db</code>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Snapshots, database diagnostics, and SHA-256 Merkle audit verification.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="border-top: 1px solid var(--border-color); text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
+    MIT © 2026 PuterVision • Autonomous Pentad Ecosystem
+  </footer>
+
+  <script>
+    const candidates = [
+      { name: 'combat_engage', agg: 0.9, caut: 0.1, greed: 0.2, exp: 0.2 },
+      { name: 'flee_and_heal', agg: 0.1, caut: 0.95, greed: 0.1, exp: 0.3 },
+      { name: 'gather_resources', agg: 0.2, caut: 0.4, greed: 0.95, exp: 0.5 },
+      { name: 'idle_patrol', agg: 0.3, caut: 0.6, greed: 0.2, exp: 0.85 }
+    ];
+
+    function update() {
+      const wAgg = parseFloat(document.getElementById('slider-agg').value);
+      const wCaut = parseFloat(document.getElementById('slider-caut').value);
+      const wGreed = parseFloat(document.getElementById('slider-greed').value);
+      const wExp = parseFloat(document.getElementById('slider-exp').value);
+
+      document.getElementById('val-agg').innerText = wAgg.toFixed(2);
+      document.getElementById('val-caut').innerText = wCaut.toFixed(2);
+      document.getElementById('val-greed').innerText = wGreed.toFixed(2);
+      document.getElementById('val-exp').innerText = wExp.toFixed(2);
+
+      const scored = candidates.map(c => {
+        const score = (c.agg * wAgg + c.caut * wCaut + c.greed * wGreed + c.exp * wExp) / (wAgg + wCaut + wGreed + wExp || 1);
+        return { name: c.name, score };
+      }).sort((a, b) => b.score - a.score);
+
+      const container = document.getElementById('ranked-list');
+      container.innerHTML = scored.map((c, i) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: ${i === 0 ? 'rgba(6, 182, 212, 0.15)' : 'rgba(255, 255, 255, 0.03)'}; border: 1px solid ${i === 0 ? 'var(--accent-cyan)' : 'transparent'}; border-radius: 6px;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: ${i === 0 ? '700' : '400'}; color: ${i === 0 ? '#fff' : 'var(--text-secondary)'};">
+            ${i + 1}. ${c.name} ${i === 0 ? '★ (Top)' : ''}
+          </span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-cyan);">
+            ${c.score.toFixed(3)}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    ['slider-agg', 'slider-caut', 'slider-greed', 'slider-exp'].forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+    update();
+  </script>
+</body>
+</html>
