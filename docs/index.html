@@ -4,15 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agent Reasoning MCP — Strategic BDI Cognitive Engine for AI Agents</title>
-  <meta name="description" content="Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, utility scoring, risk evaluation, and reactive replanning.">
+  <meta name="description" content="Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, multi-attribute expected utility scoring, exponential belief decay, risk evaluation, and reactive replanning.">
   <meta name="keywords" content="mcp, model-context-protocol, reasoning, bdi-agent, goal-planning, utility-theory, ai-agents, putervision, sqlite">
-  <meta property="og:title" content="Agent Reasoning MCP — PuterVision">
-  <meta property="og:description" content="Strategic BDI reasoning engine for autonomous AI agents.">
+  <meta name="author" content="PuterVision">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0b0f19">
+  <link rel="canonical" href="https://agentreasoningmcp.com/">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://agentreasoningmcp.com/">
+  <meta property="og:title" content="Agent Reasoning MCP — Strategic BDI Cognitive Engine for AI Agents">
+  <meta property="og:description" content="Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, multi-attribute expected utility scoring, exponential belief decay, and reactive replanning.">
+  <meta property="og:image" content="putervision-icon.png">
+  <meta property="og:site_name" content="PuterVision">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://agentreasoningmcp.com/">
+  <meta name="twitter:title" content="Agent Reasoning MCP — Strategic BDI Cognitive Engine for AI Agents">
+  <meta name="twitter:description" content="Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, multi-attribute expected utility scoring, exponential belief decay, and reactive replanning.">
+  <meta name="twitter:image" content="putervision-icon.png">
+
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -21,24 +40,53 @@
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Cross-platform",
     "offers": { "@type": "Offer", "price": "0" },
-    "description": "Strategic BDI reasoning engine for autonomous AI agents."
+    "description": "Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, utility scoring, exponential belief decay, and reactive replanning.",
+    "url": "https://agentreasoningmcp.com/",
+    "author": {
+      "@type": "Organization",
+      "name": "PuterVision",
+      "url": "https://putervision.com"
+    }
   }
   </script>
 </head>
 <body>
   <div class="glow-backdrop"></div>
+  <div class="glow-backdrop-2"></div>
+
   <header>
-    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1rem 2rem;">
-      <div style="font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.5rem;">
-        <span style="color: var(--accent-cyan);">PuterVision</span> / agent-reasoning-mcp
-      </div>
-      <nav style="display: flex; gap: 1.5rem; font-size: 0.9rem;">
-        <a href="#simulator" style="color: var(--text-secondary); text-decoration: none;">Simulator</a>
-        <a href="#tools" style="color: var(--text-secondary); text-decoration: none;">Tools</a>
-        <a href="#architecture" style="color: var(--text-secondary); text-decoration: none;">Architecture</a>
-        <a href="https://github.com/putervision/agent-reasoning-mcp" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">GitHub →</a>
-      </nav>
+    <div class="logo">
+      <a href="https://putervision.com" target="_blank" rel="noopener noreferrer" class="brand-link">
+        <img src="putervision-icon.png" alt="PuterVision Icon" class="nav-brand-img"> PuterVision
+      </a>
+      <span class="logo-sep">/</span>
+      <a href="https://agentreasoningmcp.com" class="logo-link">
+        <span class="logo-text">🧠 agent-reasoning-mcp</span>
+      </a>
     </div>
+    <nav aria-label="Main Navigation">
+      <ul class="nav-links">
+        <li><a href="#simulator">Simulator</a></li>
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#quickstart">Quickstart</a></li>
+      </ul>
+    </nav>
+    <a href="https://github.com/putervision/agent-reasoning-mcp" class="btn-github" target="_blank"
+      rel="noopener noreferrer" title="Star agent-reasoning-mcp on GitHub">
+      <svg height="16" width="16" viewBox="0 0 16 16" fill="#fbbf24">
+        <path
+          d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z">
+        </path>
+      </svg>
+      <span>Star on</span>
+      <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+      <span>GitHub</span>
+    </a>
   </header>
 
   <main style="max-width: 1200px; margin: 0 auto; padding: 3rem 2rem;">
@@ -47,14 +95,15 @@
       <div style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent-cyan); font-size: 0.85rem; margin-bottom: 1rem;">
         Model Context Protocol Server • v0.1.1
       </div>
-      <h1 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; background: linear-gradient(135deg, #fff 0%, #9ca3af 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      <h1 class="hero-title" style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; background: linear-gradient(135deg, #fff 0%, #9ca3af 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
         Strategic BDI Reasoning & Decision Intelligence
       </h1>
       <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 800px; margin: 0 auto 2rem;">
-        Hierarchical goal decomposition, multi-attribute expected utility theory (\(E[U] = \sum w_i u_i\)), exponential belief decay, and reactive replanning for autonomous agents.
+        Hierarchical goal decomposition, multi-attribute expected utility theory (\(E[U] = \sum w_i u_i\)), exponential belief decay, and reactive replanning for autonomous AI agents.
       </p>
-      <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem 1.5rem; display: inline-flex; align-items: center; gap: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">
-        <code>npx @putervision/agent-reasoning-mcp init</code>
+      <div class="code-container" style="display: inline-flex; width: auto; max-width: 100%; justify-content: center; gap: 1rem;">
+        <span class="code-text">npx @putervision/agent-reasoning-mcp init</span>
+        <button class="btn-copy" onclick="copyToClipboard('npx @putervision/agent-reasoning-mcp init', this)">Copy</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1.5rem; font-style: italic;">
         *Functional agency and closed-loop automation — not consciousness, sentience, or AGI.*
@@ -69,7 +118,7 @@
       <p style="color: var(--text-secondary); margin-bottom: 2rem;">
         Adjust the agent's utility scoring profile sliders to observe real-time dynamic action ranking and risk assessment.
       </p>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      <div class="simulator-grid">
         <div>
           <div style="margin-bottom: 1.25rem;">
             <label style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 0.25rem;">
@@ -105,57 +154,184 @@
 
     <!-- 10 Tools Explorer -->
     <section id="tools" style="margin-bottom: 4rem;">
-      <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem;">🛠️ Consolidated MCP Tools (10 Tools)</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+      <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🛠️ Consolidated MCP Tools (10 Tools)</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Comprehensive BDI cognitive capabilities exposed cleanly through the standard Model Context Protocol.
+      </p>
+      <div class="tools-grid">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">set_goal</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Manage hierarchical objectives, decompose into sub-goals, and propagate progress.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Manage hierarchical objectives, decompose into sub-goals, and propagate progress across DAGs.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">evaluate_situation</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Score environment snapshots against active utility weights and recommend top actions.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Score environment snapshots against active utility weights and recommend top candidate actions.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">replan</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Adaptively regenerate goal DAGs and abort invalidated intentions upon blockers.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Adaptively regenerate goal DAGs and abort invalidated intentions upon unexpected obstacles.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">assess_risk</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Quantitative threat and risk calculation for candidate actions.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Quantitative failure severity, reversibility, and blast-radius risk calculation for actions.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">query_knowledge</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Search learned heuristics, tactics, and past decision patterns.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Search learned heuristics, domain tactics, and historical decision outcomes.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">set_utility_weights</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Configure multi-attribute utility profiles (aggression, caution, greed, exploration).</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Configure multi-attribute utility profiles (aggression, caution, greed, exploration, efficiency, cooperation).</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">get_decision_trace</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Explainable chain-of-thought rationale playback and latency stats.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Explainable chain-of-thought rationale playback, scoring breakdowns, and execution latency stats.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">manage_beliefs</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Maintain structured beliefs with exponential confidence decay and TTL sweeps.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Maintain structured beliefs with exponential confidence decay and automated TTL cleanup sweeps.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">manage_intentions</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Queue, dispatch, and track behavior directives for runtime execution.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Queue, dispatch, prioritize, and track executable behavior directives for runtime engines.</p>
         </div>
-        <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">manage_reasoning_db</code>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Snapshots, database diagnostics, and SHA-256 Merkle audit verification.</p>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Database maintenance, diagnostics, point-in-time snapshots, and SHA-256 Merkle audit verification.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" style="margin-bottom: 4rem;">
+      <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        🏛️ BDI Cognitive Architecture
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        A mathematically rigorous, explainable BDI (Belief-Desire-Intention) loop designed to bridge sensory perception and high-frequency execution.
+      </p>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3 style="color: var(--accent-cyan);">📡 1. Belief Maintenance</h3>
+          <p>Structured belief state where every fact carries confidence that decays exponentially over time: <code>B(t) = B₀ · e^(-λt)</code>. Perceptions refresh confidence; stale assumptions are culled automatically via TTL sweeps.</p>
+        </div>
+        <div class="arch-card">
+          <h3 style="color: var(--accent-cyan);">🎯 2. Hierarchical Goal DAGs</h3>
+          <p>Complex objectives decompose into directed acyclic graphs of sub-goals. Progress dynamically rolls up from leaves to roots, preventing duplicated effort and circular dependencies.</p>
+        </div>
+        <div class="arch-card">
+          <h3 style="color: var(--accent-cyan);">⚖️ 3. Expected Utility Theory</h3>
+          <p>Candidate actions are ranked using multi-attribute expected utility: <code>E[U] = ∑ wᵢ · uᵢ</code> across calibrated weights (Aggression, Caution, Greed, Exploration, Efficiency, and Cooperation).</p>
+        </div>
+        <div class="arch-card">
+          <h3 style="color: var(--accent-cyan);">🛡️ 4. Quantitative Risk Assessment</h3>
+          <p>Every proposal undergoes risk evaluation measuring failure probability, reversibility penalty, and worst-case blast radius before selection, preventing catastrophic actions.</p>
+        </div>
+        <div class="arch-card">
+          <h3 style="color: var(--accent-cyan);">⚡ 5. Intention Dispatch Queue</h3>
+          <p>Selected top actions become firm intentions dispatched via wire contract to runtime behavior engines (such as <code>behavior-mcp</code>) with priority preemption and execution timeouts.</p>
+        </div>
+        <div class="arch-card">
+          <h3 style="color: var(--accent-cyan);">🔄 6. Reactive Replanning & Audit</h3>
+          <p>When environmental blockers invalidate assumptions, the replanner recalculates alternative paths, culls unviable intentions, and logs decisions to a tamper-evident SHA-256 Merkle audit trail.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quickstart Section -->
+    <section id="quickstart" style="margin-bottom: 4rem;">
+      <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🚀 Quickstart & Client Integration</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Add <code>agent-reasoning-mcp</code> to your AI coding assistant with zero external dependencies.
+      </p>
+
+      <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: #fff;">1. Global Installation</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;">Install globally via npm for CLI and server usage:</p>
+        <div class="code-container">
+          <span class="code-text">npm install -g @putervision/agent-reasoning-mcp</span>
+          <button class="btn-copy" onclick="copyToClipboard('npm install -g @putervision/agent-reasoning-mcp', this)">Copy</button>
+        </div>
+      </div>
+
+      <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: #fff;">2. Client Configurations</h3>
+
+        <div style="margin-bottom: 1.25rem;">
+          <h4 style="font-size: 0.95rem; color: var(--accent-cyan); margin-bottom: 0.4rem;">Claude Code CLI</h4>
+          <div class="code-container">
+            <span class="code-text">claude mcp add agent-reasoning-mcp -- npx -y @putervision/agent-reasoning-mcp</span>
+            <button class="btn-copy" onclick="copyToClipboard('claude mcp add agent-reasoning-mcp -- npx -y @putervision/agent-reasoning-mcp', this)">Copy</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <h4 style="font-size: 0.95rem; color: var(--accent-cyan); margin-bottom: 0.4rem;">Cursor IDE (.cursor/mcp.json)</h4>
+          <div class="code-container" style="display: block; white-space: pre; overflow-x: auto; padding: 1rem;">
+<span class="code-text">{
+  "mcpServers": {
+    "agent-reasoning-mcp": {
+      "command": "npx",
+      "args": ["-y", "@putervision/agent-reasoning-mcp"]
+    }
+  }
+}</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.95rem; color: var(--accent-cyan); margin-bottom: 0.4rem;">Gemini CLI</h4>
+          <div class="code-container">
+            <span class="code-text">gemini mcp add agent-reasoning-mcp npx -y @putervision/agent-reasoning-mcp</span>
+            <button class="btn-copy" onclick="copyToClipboard('gemini mcp add agent-reasoning-mcp npx -y @putervision/agent-reasoning-mcp', this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.75rem;">
+        <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem; color: #fff;">3. Health & Database Verification</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;">Verify installation and audit SQLite database health:</p>
+        <div class="code-container">
+          <span class="code-text">agent-reasoning-mcp doctor</span>
+          <button class="btn-copy" onclick="copyToClipboard('agent-reasoning-mcp doctor', this)">Copy</button>
         </div>
       </div>
     </section>
   </main>
 
-  <footer style="border-top: 1px solid var(--border-color); text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
-    MIT © 2026 PuterVision • Autonomous Pentad Ecosystem
+  <footer>
+    <p>&copy; 2025-2026 <a href="https://putervision.com" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none;">PuterVision</a>. Direct inquiries to <a href="mailto:contact@putervision.com" style="color: var(--accent-cyan); text-decoration: none;">contact@putervision.com</a>.</p>
+    <p style="font-size: 0.78rem; margin-top: 0.75rem; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.4; color: var(--text-secondary);">
+      <strong>Local Privacy & Data Protection Guarantee:</strong> agent-reasoning-mcp runs 100% locally on your machine. All goal hierarchies, belief decay logs, utility profiles, candidate action evaluations, and decision traces are stored locally in your workspace's <code>.agent-reasoning-mcp/reasoning.db</code> SQLite database. No telemetry, reasoning traces, or workspace logs are ever transmitted or collected by PuterVision.
+    </p>
+    <p style="font-size: 0.75rem; margin-top: 0.5rem; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.4; color: var(--text-secondary);">
+      <strong>Third-Party AI Model API Fees:</strong> agent-reasoning-mcp is an open-source MCP server released under the MIT License. Interfacing with AI models (such as Anthropic Claude, OpenAI GPT-4o, xAI Grok, or Google Gemini) via coding clients may incur API usage fees billed directly by those respective providers. PuterVision is not responsible for third-party API token billing.
+    </p>
+    <p style="font-size: 0.75rem; margin-top: 0.5rem; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.4; color: var(--text-secondary);">
+      <strong>Disclaimer:</strong> This software is provided "as is", without warranty of any kind, express or implied. Under no circumstances shall PuterVision or contributors be liable for any database corruption, execution errors, or damages resulting from cognitive decisions made by autonomous agents. Always test policies in simulation before deploying to high-stakes environments.
+    </p>
+    <p style="font-size: 0.7rem; margin-top: 0.5rem; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.4; color: var(--text-secondary);">
+      * All product names, trademarks, logos, and brands (such as Cursor, Claude, OpenAI, Gemini, Windsurf, GitHub, and SQLite) are property of their respective owners. Reference to third-party technologies is for compatibility identification only and does not imply endorsement, sponsorship, or affiliation.
+    </p>
   </footer>
 
   <script>
+    // Copy button helper
+    function copyToClipboard(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        if (btnElement) {
+          const originalText = btnElement.textContent;
+          btnElement.textContent = 'Copied!';
+          btnElement.style.color = '#10b981';
+          setTimeout(() => {
+            btnElement.textContent = originalText;
+            btnElement.style.color = '';
+          }, 2000);
+        }
+      });
+    }
+
+    // Utility simulator logic
     const candidates = [
       { name: 'combat_engage', agg: 0.9, caut: 0.1, greed: 0.2, exp: 0.2 },
       { name: 'flee_and_heal', agg: 0.1, caut: 0.95, greed: 0.1, exp: 0.3 },
