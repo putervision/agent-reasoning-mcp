@@ -2,7 +2,11 @@ import { UtilityProfile, CandidateAction } from '../schema/types.js';
 
 export class UtilityEngine {
   static scoreCandidate(
-    candidate: { action: string; parameters?: Record<string, unknown>; attributes?: Record<string, number> },
+    candidate: {
+      action: string;
+      parameters?: Record<string, unknown>;
+      attributes?: Record<string, number>;
+    },
     profile: UtilityProfile
   ): CandidateAction {
     const attrs = candidate.attributes || {
@@ -38,7 +42,11 @@ export class UtilityEngine {
   }
 
   static rankCandidates(
-    candidates: Array<{ action: string; parameters?: Record<string, unknown>; attributes?: Record<string, number> }>,
+    candidates: Array<{
+      action: string;
+      parameters?: Record<string, unknown>;
+      attributes?: Record<string, number>;
+    }>,
     profile: UtilityProfile
   ): CandidateAction[] {
     const scored = candidates.map((c) => this.scoreCandidate(c, profile));

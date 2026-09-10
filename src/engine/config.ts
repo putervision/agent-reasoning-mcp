@@ -1,19 +1,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { z } from 'zod';
 import { logger } from '../utils/logger.js';
 
-export interface ProjectConfig {
-  projectName?: string;
-  defaultBranch?: string;
-  storagePath?: string;
-  allowedExportDirs?: string[];
-  busyTimeoutMs?: number;
-  mmapSizeBytes?: number;
-  beliefDecayRate?: number;
-  spatialTtlMs?: number;
-  maxGoalDepth?: number;
-  accessMode?: 'normal' | 'read_only';
-}
+export const ProjectConfigSchema = z
+  .object({
+    projectName: z.string().optional(),
+    defaultBranch: z.string().optional(),
+    storagePath: z.string().optional(),
+    allowedExportDirs: z.array(z.string()).optional(),
+    busyTimeoutMs: z.number().int().positive().optional(),
+    mmapSizeBytes: z.number().int().positive().optional(),
+    beliefDecayRate: z.number().min(0).max(1).optional(),
+    spatialTtlMs: z.number().int().positive().optional(),
+    maxGoalDepth: z.number().int().positive().optional(),
+    accessMode: z.enum(['normal', 'read_only']).optional(),
+  })
+  .passthrough();
+
+export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
 
 const cachedConfigs = new Map<string, { config: ProjectConfig; timestamp: number }>();
 const CONFIG_TTL_MS = 2000;
@@ -25,16 +30,28 @@ export function loadProjectConfig(projectRoot: string): ProjectConfig {
     return cached.config;
   }
 
-  const configPath = path.join(projectRoot, '.agent-reasoning-mcp.json');
+  const effectiveRoot = process.env.PUTERVISION_PROJECT_DIR || projectRoot;
+  const configPath = path.join(effectiveRoot, '.agent-reasoning-mcp.json');
   let config: ProjectConfig = {};
 
   if (fs.existsSync(configPath)) {
     try {
       const raw = fs.readFileSync(configPath, 'utf-8');
-      config = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      const validated = ProjectConfigSchema.safeParse(parsed);
+      if (validated.success) {
+        config = validated.data;
+      } else {
+        logger.warn(`Invalid .agent-reasoning-mcp.json schema: ${validated.error.message}`);
+        config = parsed;
+      }
     } catch (err: any) {
       logger.warn(`Failed to parse .agent-reasoning-mcp.json: ${err.message}`);
     }
+  }
+
+  if (process.env.PUTERVISION_PROJECT_SLUG && !config.projectName) {
+    config.projectName = process.env.PUTERVISION_PROJECT_SLUG;
   }
 
   cachedConfigs.set(projectRoot, { config, timestamp: now });

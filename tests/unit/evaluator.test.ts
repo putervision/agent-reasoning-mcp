@@ -16,7 +16,14 @@ describe('EvaluatorEngine', () => {
     UtilityProfileEngine.configureProfile(db, {
       project: 'test',
       name: 'aggressive_profile',
-      weights: { aggression: 0.9, caution: 0.1, greed: 0.5, efficiency: 0.5, exploration: 0.5, cooperation: 0.5 },
+      weights: {
+        aggression: 0.9,
+        caution: 0.1,
+        greed: 0.5,
+        efficiency: 0.5,
+        exploration: 0.5,
+        cooperation: 0.5,
+      },
       is_active: true,
     });
 

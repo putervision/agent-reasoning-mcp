@@ -9,7 +9,9 @@ export function runMigrations(db: Database.Database): void {
     );
   `);
 
-  const currentVersionRow = db.prepare("SELECT value FROM schema_meta WHERE key = 'version'").get() as { value: string } | undefined;
+  const currentVersionRow = db
+    .prepare("SELECT value FROM schema_meta WHERE key = 'version'")
+    .get() as { value: string } | undefined;
   const currentVersion = currentVersionRow ? parseInt(currentVersionRow.value, 10) : 0;
 
   if (currentVersion < 1) {

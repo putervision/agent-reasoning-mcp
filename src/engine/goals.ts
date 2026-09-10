@@ -5,6 +5,7 @@ import { getCurrentIsoString } from '../utils/time.js';
 import { safeJsonParse, safeJsonStringify } from '../utils/json-validator.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
 import { logReasoningEvent } from './events.js';
+import { sanitizeKeys } from '../utils/sanitize.js';
 
 export class GoalEngine {
   static createGoal(
@@ -38,7 +39,9 @@ export class GoalEngine {
     }
 
     if (params.parent_id) {
-      const parent = db.prepare('SELECT id FROM goals WHERE project = ? AND id = ?').get(params.project, params.parent_id);
+      const parent = db
+        .prepare('SELECT id FROM goals WHERE project = ? AND id = ?')
+        .get(params.project, params.parent_id);
       if (!parent) {
         throw new NotFoundError(`Parent goal ${params.parent_id} not found.`);
       }
@@ -48,14 +51,17 @@ export class GoalEngine {
     const now = getCurrentIsoString();
     const status = params.status || 'active';
     const priority = params.priority !== undefined ? params.priority : 0.5;
+    const sanitizedMetadata = params.metadata ? sanitizeKeys(params.metadata) : null;
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO goals (
         id, project, session_id, parent_id, title, description, status, priority,
         utility_weights_json, deadline_at, progress, success_criteria_json,
         metadata_json, client_request_id, created_at, updated_at, version
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.0, ?, ?, ?, ?, ?, 1)
-    `).run(
+    `
+    ).run(
       id,
       params.project,
       params.session_id ?? null,
@@ -67,7 +73,7 @@ export class GoalEngine {
       params.utility_weights ? safeJsonStringify(params.utility_weights) : null,
       params.deadline_at ?? null,
       params.success_criteria ? safeJsonStringify(params.success_criteria) : null,
-      params.metadata ? safeJsonStringify(params.metadata) : null,
+      sanitizedMetadata ? safeJsonStringify(sanitizedMetadata) : null,
       params.client_request_id ?? null,
       now,
       now
@@ -94,7 +100,7 @@ export class GoalEngine {
       deadline_at: params.deadline_at,
       progress: 0.0,
       success_criteria: params.success_criteria,
-      metadata: params.metadata,
+      metadata: sanitizedMetadata || undefined,
       client_request_id: params.client_request_id,
       created_at: now,
       updated_at: now,
@@ -116,7 +122,9 @@ export class GoalEngine {
       metadata?: Record<string, unknown>;
     }
   ): Goal {
-    const existing = db.prepare('SELECT * FROM goals WHERE project = ? AND id = ?').get(params.project, params.id) as any;
+    const existing = db
+      .prepare('SELECT * FROM goals WHERE project = ? AND id = ?')
+      .get(params.project, params.id) as any;
     if (!existing) {
       throw new NotFoundError(`Goal ${params.id} not found.`);
     }
@@ -128,15 +136,33 @@ export class GoalEngine {
     const priority = params.priority !== undefined ? params.priority : existing.priority;
     const progress = params.progress !== undefined ? params.progress : existing.progress;
     const failure_reason = params.failure_reason ?? existing.failure_reason;
-    const metadata_json = params.metadata ? safeJsonStringify({ ...safeJsonParse(existing.metadata_json, {}), ...params.metadata }) : existing.metadata_json;
+    const metadata_json = params.metadata
+      ? safeJsonStringify(
+          sanitizeKeys({ ...safeJsonParse(existing.metadata_json, {}), ...params.metadata })
+        )
+      : existing.metadata_json;
     const version = existing.version + 1;
 
-    db.prepare(`
+    db.prepare(
+      `
       UPDATE goals SET
         title = ?, description = ?, status = ?, priority = ?, progress = ?,
         failure_reason = ?, metadata_json = ?, updated_at = ?, version = ?
       WHERE project = ? AND id = ?
-    `).run(title, description, status, priority, progress, failure_reason, metadata_json, now, version, params.project, params.id);
+    `
+    ).run(
+      title,
+      description,
+      status,
+      priority,
+      progress,
+      failure_reason,
+      metadata_json,
+      now,
+      version,
+      params.project,
+      params.id
+    );
 
     logReasoningEvent(db, {
       project: params.project,
@@ -178,7 +204,9 @@ export class GoalEngine {
   }
 
   static getGoal(db: Database.Database, params: { project: string; id: string }): Goal {
-    const row = db.prepare('SELECT * FROM goals WHERE project = ? AND id = ?').get(params.project, params.id) as any;
+    const row = db
+      .prepare('SELECT * FROM goals WHERE project = ? AND id = ?')
+      .get(params.project, params.id) as any;
     if (!row) throw new NotFoundError(`Goal ${params.id} not found.`);
     return this.mapRowToGoal(row);
   }
@@ -210,7 +238,10 @@ export class GoalEngine {
     return rows.map((r) => this.mapRowToGoal(r));
   }
 
-  static abandonGoal(db: Database.Database, params: { project: string; id: string; reason?: string }): Goal {
+  static abandonGoal(
+    db: Database.Database,
+    params: { project: string; id: string; reason?: string }
+  ): Goal {
     return this.updateGoal(db, {
       project: params.project,
       id: params.id,

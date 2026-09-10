@@ -27,13 +27,15 @@ export class KnowledgeEngine {
     const now = getCurrentIsoString();
     const confidence = params.confidence !== undefined ? params.confidence : 0.7;
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO knowledge_patterns (
         id, project, pattern_type, context_tags_json, situation_pattern,
         recommended_strategy, confidence, sample_count, success_rate,
         metadata_json, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, 1.0, ?, ?, ?)
-    `).run(
+    `
+    ).run(
       id,
       params.project,
       params.pattern_type,
@@ -114,5 +116,49 @@ export class KnowledgeEngine {
       created_at: row.created_at,
       updated_at: row.updated_at,
     };
+  }
+
+  /**
+   * Seeds tactical domain heuristics for gaming and autonomous agent navigation.
+   */
+  static seedDefaultPatterns(db: Database.Database, project: string): number {
+    const defaults = [
+      {
+        pattern_type: 'heuristic' as const,
+        context_tags: ['combat', 'kiting', 'tactics'],
+        situation_pattern: 'Melee enemy approaching within aggro range',
+        recommended_strategy:
+          'Maintain distance, cast snare/slow ability, and backpedal along clear AABB path',
+        confidence: 0.9,
+      },
+      {
+        pattern_type: 'optimization' as const,
+        context_tags: ['gathering', 'economy', 'inventory'],
+        situation_pattern: 'Inventory weight exceeds capacity threshold (>85%)',
+        recommended_strategy:
+          'Pause harvesting loop, plot waypoint route to bank/vendor, deposit heavy resources before resuming',
+        confidence: 0.95,
+      },
+      {
+        pattern_type: 'contingency' as const,
+        context_tags: ['dungeon', 'survival', 'emergency'],
+        situation_pattern: 'Player health falls below 30% during combat',
+        recommended_strategy:
+          'Trigger high-priority preemption interrupt, consume health potion, and reposition behind obstacle cover',
+        confidence: 0.98,
+      },
+    ];
+
+    let count = 0;
+    for (const p of defaults) {
+      const existing = db
+        .prepare('SELECT id FROM knowledge_patterns WHERE project = ? AND situation_pattern = ?')
+        .get(project, p.situation_pattern);
+      if (!existing) {
+        this.createPattern(db, { project, ...p });
+        count++;
+      }
+    }
+    return count;
   }
 }

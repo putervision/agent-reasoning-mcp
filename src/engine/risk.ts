@@ -39,7 +39,8 @@ export class RiskEngine {
 
     if (profile) {
       // Adjust risk perception by caution vs aggression weights
-      riskScore = riskScore * (profile.weights.caution || 0.5) / (profile.weights.aggression || 0.5);
+      riskScore =
+        (riskScore * (profile.weights.caution || 0.5)) / (profile.weights.aggression || 0.5);
     }
 
     riskScore = Math.max(0, Math.min(1, riskScore));

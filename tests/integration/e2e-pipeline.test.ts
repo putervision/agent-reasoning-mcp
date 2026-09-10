@@ -54,7 +54,10 @@ describe('Scenario 7: Deterministic LLM-Free E2E Pipeline', () => {
     });
     expect(intention.status).toBe('pending');
 
-    const dispatched = IntentionEngine.dispatchIntention(db, { project: 'e2e_project', id: intention.id });
+    const dispatched = IntentionEngine.dispatchIntention(db, {
+      project: 'e2e_project',
+      id: intention.id,
+    });
     expect(dispatched.status).toBe('dispatched');
 
     // 4. Resolve Intention

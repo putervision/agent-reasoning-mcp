@@ -1,8 +1,37 @@
-# Configuration: agent-reasoning-mcp
+# Configuration Guide: `@putervision/agent-reasoning-mcp`
 
-Configurable via `.agent-reasoning-mcp.json` or environment variables:
-- `REASONING_LOG_LEVEL`: `debug`, `info`, `warn`, `error` (default: `info`)
-- `REASONING_BUSY_TIMEOUT_MS`: SQLite lock timeout (default: `5000`)
-- `REASONING_MMAP_SIZE_BYTES`: Memory-mapped I/O size (default: `134217728` / 128MB)
-- `REASONING_BELIEF_DECAY_RATE`: Default lambda per hour (default: `0.05`)
-- `REASONING_SPATIAL_TTL_MS`: Spatial belief TTL (default: `300000` / 5m)
+`@putervision/agent-reasoning-mcp` can be customized via `.agent-reasoning-mcp.json` in your project root or via environment variables.
+
+---
+
+## Configuration File (`.agent-reasoning-mcp.json`)
+
+```json
+{
+  "projectName": "my-agent-workspace",
+  "activeProfile": "balanced",
+  "beliefDecayRate": 0.05,
+  "maxGoalsDepth": 5,
+  "busyTimeoutMs": 5000,
+  "mmapSizeBytes": 134217728,
+  "accessMode": "normal"
+}
+```
+
+### Options Reference
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `projectName` | `string` | auto-detected | Slug identifier for project database isolation |
+| `activeProfile` | `string` | `"balanced"` | Default active utility profile name |
+| `beliefDecayRate` | `number` | `0.05` | Exponential decay constant \(\lambda\) for belief confidence |
+| `maxGoalsDepth` | `number` | `5` | Maximum allowable depth for subgoal hierarchy decomposition |
+| `busyTimeoutMs` | `number` | `5000` | SQLite WAL busy timeout in milliseconds |
+| `mmapSizeBytes` | `number` | `134217728` | Memory-mapped I/O size (128 MB default) |
+| `accessMode` | `enum` | `"normal"` | Set to `"read_only"` for query-only analysis |
+
+---
+
+## Environment Variables
+- `REASONING_PROJECT`: Override target project slug.
+- `REASONING_LOG_LEVEL`: Set log level (`debug`, `info`, `warn`, `error`).
+- `REASONING_MCP_DIR`: Custom directory for SQLite database storage.

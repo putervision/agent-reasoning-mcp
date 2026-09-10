@@ -1,6 +1,6 @@
 {
   "name": "@putervision/agent-reasoning-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Strategic BDI reasoning engine for autonomous AI agents \u2014 goal decomposition, utility scoring, risk evaluation, and reactive replanning over PuterVision memory and world models.",
   "keywords": [
     "mcp",
@@ -86,6 +86,7 @@
     "test:coverage": "vitest run --coverage",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:matrix": "bash scripts/test-matrix.sh",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },

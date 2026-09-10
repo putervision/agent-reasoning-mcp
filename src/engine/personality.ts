@@ -5,6 +5,7 @@ import { getCurrentIsoString } from '../utils/time.js';
 import { safeJsonParse, safeJsonStringify } from '../utils/json-validator.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
 import { logReasoningEvent } from './events.js';
+import { sanitizeKeys } from '../utils/sanitize.js';
 
 export class UtilityProfileEngine {
   static configureProfile(
@@ -29,7 +30,7 @@ export class UtilityProfileEngine {
       efficiency: 0.5,
       exploration: 0.5,
       cooperation: 0.5,
-      ...params.weights,
+      ...sanitizeKeys(params.weights),
     };
 
     const now = getCurrentIsoString();
@@ -42,11 +43,13 @@ export class UtilityProfileEngine {
     }
 
     if (existing) {
-      db.prepare(`
+      db.prepare(
+        `
         UPDATE utility_profiles SET
           description = ?, weights_json = ?, is_active = ?, updated_at = ?
         WHERE id = ?
-      `).run(
+      `
+      ).run(
         params.description ?? existing.description,
         safeJsonStringify(defaultWeights),
         params.is_active ? 1 : existing.is_active,
@@ -60,10 +63,21 @@ export class UtilityProfileEngine {
     const id = generateId() as ProfileId;
     const isActive = params.is_active ? 1 : 0;
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO utility_profiles (id, project, name, description, weights_json, is_active, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, params.project, params.name, params.description ?? null, safeJsonStringify(defaultWeights), isActive, now, now);
+    `
+    ).run(
+      id,
+      params.project,
+      params.name,
+      params.description ?? null,
+      safeJsonStringify(defaultWeights),
+      isActive,
+      now,
+      now
+    );
 
     logReasoningEvent(db, {
       project: params.project,
@@ -86,7 +100,9 @@ export class UtilityProfileEngine {
   }
 
   static getActiveProfile(db: Database.Database, project: string): UtilityProfile {
-    const row = db.prepare('SELECT * FROM utility_profiles WHERE project = ? AND is_active = 1').get(project) as any;
+    const row = db
+      .prepare('SELECT * FROM utility_profiles WHERE project = ? AND is_active = 1')
+      .get(project) as any;
     if (row) return this.mapRowToProfile(row);
 
     // Default fallback profile
@@ -109,22 +125,35 @@ export class UtilityProfileEngine {
     };
   }
 
-  static getProfile(db: Database.Database, params: { project: string; name: string }): UtilityProfile {
-    const row = db.prepare('SELECT * FROM utility_profiles WHERE project = ? AND name = ?').get(params.project, params.name) as any;
+  static getProfile(
+    db: Database.Database,
+    params: { project: string; name: string }
+  ): UtilityProfile {
+    const row = db
+      .prepare('SELECT * FROM utility_profiles WHERE project = ? AND name = ?')
+      .get(params.project, params.name) as any;
     if (!row) throw new NotFoundError(`Utility profile "${params.name}" not found.`);
     return this.mapRowToProfile(row);
   }
 
   static listProfiles(db: Database.Database, project: string): UtilityProfile[] {
-    const rows = db.prepare('SELECT * FROM utility_profiles WHERE project = ? ORDER BY is_active DESC, name ASC').all(project) as any[];
+    const rows = db
+      .prepare('SELECT * FROM utility_profiles WHERE project = ? ORDER BY is_active DESC, name ASC')
+      .all(project) as any[];
     return rows.map((r) => this.mapRowToProfile(r));
   }
 
-  static activateProfile(db: Database.Database, params: { project: string; name: string }): UtilityProfile {
+  static activateProfile(
+    db: Database.Database,
+    params: { project: string; name: string }
+  ): UtilityProfile {
     const profile = this.getProfile(db, params);
     db.transaction(() => {
       db.prepare('UPDATE utility_profiles SET is_active = 0 WHERE project = ?').run(params.project);
-      db.prepare('UPDATE utility_profiles SET is_active = 1 WHERE project = ? AND name = ?').run(params.project, params.name);
+      db.prepare('UPDATE utility_profiles SET is_active = 1 WHERE project = ? AND name = ?').run(
+        params.project,
+        params.name
+      );
     })();
     return { ...profile, is_active: true };
   }

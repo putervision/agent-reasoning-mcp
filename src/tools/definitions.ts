@@ -4,16 +4,13 @@ export interface ToolDefinition {
   inputSchema: Record<string, unknown>;
 }
 
-export const READ_ONLY_TOOLS = new Set([
-  'query_beliefs',
-  'get_decision_trace',
-  'query_knowledge',
-]);
+export const READ_ONLY_TOOLS = new Set(['query_beliefs', 'get_decision_trace', 'query_knowledge']);
 
 export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'set_goal',
-    description: 'Register, update, decompose, or manage hierarchical goals and task DAGs in the reasoning engine.',
+    description:
+      'Register, update, decompose, or manage hierarchical goals and task DAGs in the reasoning engine.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -35,7 +32,11 @@ export const toolDefinitions: ToolDefinition[] = [
         utility_weights: { type: 'object', description: 'Goal-specific utility weight overrides' },
         deadline_at: { type: 'string', description: 'ISO-8601 deadline timestamp' },
         progress: { type: 'number', description: 'Completion progress (0.0 to 1.0)' },
-        success_criteria: { type: 'array', items: { type: 'string' }, description: 'List of verifiable conditions' },
+        success_criteria: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'List of verifiable conditions',
+        },
         subgoals: {
           type: 'array',
           items: {
@@ -49,7 +50,10 @@ export const toolDefinitions: ToolDefinition[] = [
           },
           description: 'Array of sub-goals for decompose action',
         },
-        client_request_id: { type: 'string', description: 'Idempotency key to prevent duplicate creation' },
+        client_request_id: {
+          type: 'string',
+          description: 'Idempotency key to prevent duplicate creation',
+        },
         project: { type: 'string', description: 'Target project slug' },
         limit: { type: 'number', description: 'Max items to return for list action' },
       },
@@ -58,7 +62,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'evaluate_situation',
-    description: 'Ingest multi-modal situation snapshot, compute expected utilities against active weights, and output prioritized action recommendations.',
+    description:
+      'Ingest multi-modal situation snapshot, compute expected utilities against active weights, and output prioritized action recommendations.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -71,7 +76,10 @@ export const toolDefinitions: ToolDefinition[] = [
           type: 'object',
           description: 'Normalized SituationSnapshot with world, vision, state, and vitals',
         },
-        quick_context: { type: 'string', description: 'Text summary of current situation for quick evaluation' },
+        quick_context: {
+          type: 'string',
+          description: 'Text summary of current situation for quick evaluation',
+        },
         candidate_actions: {
           type: 'array',
           items: {
@@ -85,7 +93,12 @@ export const toolDefinitions: ToolDefinition[] = [
           },
           description: 'Candidate actions to score and rank',
         },
-        utility_profile: { type: 'string', description: 'Named utility profile to score against (defaults to active)' },
+        utility_profile: {
+          type: 'string',
+          description: 'Named utility profile to score against (defaults to active)',
+        },
+        session_id: { type: 'string', description: 'Linked state-memory session ID' },
+        trace_id: { type: 'string', description: 'Distributed trace ID' },
         project: { type: 'string', description: 'Target project slug' },
       },
       required: ['action'],
@@ -93,7 +106,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'replan',
-    description: 'Regenerate sub-task DAG and abort/recreate intentions upon unexpected blockers or environmental state changes.',
+    description:
+      'Regenerate sub-task DAG and abort/recreate intentions upon unexpected blockers or environmental state changes.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -103,9 +117,15 @@ export const toolDefinitions: ToolDefinition[] = [
           description: 'Replanning trigger type',
         },
         goal_id: { type: 'string', description: 'ID of goal to replan' },
-        blocker_description: { type: 'string', description: 'Description of the obstacle or blocker encountered' },
+        blocker_description: {
+          type: 'string',
+          description: 'Description of the obstacle or blocker encountered',
+        },
         trigger_event: { type: 'string', description: 'Event description triggering replanning' },
-        preserve_completed: { type: 'boolean', description: 'Whether to preserve already completed subgoals' },
+        preserve_completed: {
+          type: 'boolean',
+          description: 'Whether to preserve already completed subgoals',
+        },
         project: { type: 'string', description: 'Target project slug' },
       },
       required: ['action', 'goal_id'],
@@ -113,7 +133,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'assess_risk',
-    description: 'Compute quantitative risk and threat assessment for candidate actions or plans against active utility weights.',
+    description:
+      'Compute quantitative risk and threat assessment for candidate actions or plans against active utility weights.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -136,7 +157,10 @@ export const toolDefinitions: ToolDefinition[] = [
           },
           description: 'Multiple actions to compare risk scores',
         },
-        situation_context: { type: 'object', description: 'Current environment telemetry & vitals' },
+        situation_context: {
+          type: 'object',
+          description: 'Current environment telemetry & vitals',
+        },
         project: { type: 'string', description: 'Target project slug' },
       },
       required: ['action'],
@@ -144,7 +168,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'query_knowledge',
-    description: 'Search learned heuristic patterns, tactics, and past decision traces by context similarity.',
+    description:
+      'Search learned heuristic patterns, tactics, and past decision traces by context similarity.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -159,7 +184,11 @@ export const toolDefinitions: ToolDefinition[] = [
           enum: ['heuristic', 'anti_pattern', 'optimization', 'contingency'],
           description: 'Filter by pattern category',
         },
-        context_tags: { type: 'array', items: { type: 'string' }, description: 'Filter by context tags' },
+        context_tags: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Filter by context tags',
+        },
         limit: { type: 'number', description: 'Max patterns to return' },
         project: { type: 'string', description: 'Target project slug' },
       },
@@ -168,7 +197,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'set_utility_weights',
-    description: 'Configure and activate multi-attribute utility weights (aggression, caution, greed, exploration, cooperation).',
+    description:
+      'Configure and activate multi-attribute utility weights (aggression, caution, greed, exploration, cooperation).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -177,7 +207,10 @@ export const toolDefinitions: ToolDefinition[] = [
           enum: ['configure', 'get', 'list', 'activate'],
           description: 'Profile operation',
         },
-        name: { type: 'string', description: 'Profile name (e.g. "aggressive", "cautious", "explorer")' },
+        name: {
+          type: 'string',
+          description: 'Profile name (e.g. "aggressive", "cautious", "explorer")',
+        },
         description: { type: 'string', description: 'Profile description' },
         weights: {
           type: 'object',
@@ -191,7 +224,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'get_decision_trace',
-    description: 'Retrieve explainable step-by-step chain-of-thought rationale, candidate utilities, and risk assessment for past decisions.',
+    description:
+      'Retrieve explainable step-by-step chain-of-thought rationale, candidate utilities, and risk assessment for past decisions.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -210,7 +244,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'manage_beliefs',
-    description: 'Maintain structured belief state with TTL expiration sweeps, exponential confidence decay, and category filtering.',
+    description:
+      'Maintain structured belief state with TTL expiration sweeps, exponential confidence decay, and category filtering.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -224,8 +259,14 @@ export const toolDefinitions: ToolDefinition[] = [
           enum: ['spatial', 'entity', 'state', 'rule', 'social'],
           description: 'Belief category',
         },
-        subject: { type: 'string', description: 'Belief subject (e.g. "north_gate", "enemy_patrol")' },
-        predicate: { type: 'string', description: 'Predicate relationship (e.g. "is_locked", "status")' },
+        subject: {
+          type: 'string',
+          description: 'Belief subject (e.g. "north_gate", "enemy_patrol")',
+        },
+        predicate: {
+          type: 'string',
+          description: 'Predicate relationship (e.g. "is_locked", "status")',
+        },
         object: { description: 'Belief value / state payload' },
         confidence: { type: 'number', description: 'Confidence score (0.0 to 1.0)' },
         source: {
@@ -244,7 +285,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'manage_intentions',
-    description: 'Queue, dispatch, track, and resolve behavior directives (wire contract) for behavior-runtime-mcp.',
+    description:
+      'Queue, dispatch, track, and resolve behavior directives (wire contract) for behavior-mcp.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -253,19 +295,37 @@ export const toolDefinitions: ToolDefinition[] = [
           enum: ['create', 'dispatch', 'get', 'list', 'cancel', 'resolve'],
           description: 'Intention operation',
         },
-        intention_id: { type: 'string', description: 'Intention ID for dispatch/get/cancel/resolve' },
+        intention_id: {
+          type: 'string',
+          description: 'Intention ID for dispatch/get/cancel/resolve',
+        },
         goal_id: { type: 'string', description: 'Linked goal ID' },
         trace_id: { type: 'string', description: 'Linked decision trace ID' },
-        behavior_name: { type: 'string', description: 'Target behavior tree name (e.g. "combat_kite", "gather_loop")' },
+        behavior_name: {
+          type: 'string',
+          description: 'Target behavior tree name (e.g. "combat_kite", "gather_loop")',
+        },
         parameters: { type: 'object', description: 'Runtime behavior parameters' },
         priority: { type: 'number', description: 'Execution priority (0.0 to 1.0)' },
         deadline_at: { type: 'string', description: 'ISO-8601 completion deadline' },
-        abort_conditions: { type: 'array', items: { type: 'object' }, description: 'Auto-abort trigger conditions' },
+        abort_conditions: {
+          type: 'array',
+          items: { type: 'object' },
+          description: 'Auto-abort trigger conditions',
+        },
         result: { type: 'object', description: 'Outcome payload for resolve action' },
         status: {
           type: 'string',
-          enum: ['pending', 'dispatched', 'running', 'completed', 'failed', 'aborted', 'interrupted'],
-          description: 'Status filter or update'
+          enum: [
+            'pending',
+            'dispatched',
+            'running',
+            'completed',
+            'failed',
+            'aborted',
+            'interrupted',
+          ],
+          description: 'Status filter or update',
         },
         client_request_id: { type: 'string', description: 'Idempotency key' },
         project: { type: 'string', description: 'Target project slug' },
@@ -275,16 +335,17 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'manage_reasoning_db',
-    description: 'Database maintenance, stats, SHA-256 Merkle audit verification, checkpoints save/restore, and diffs.',
+    description:
+      'Database maintenance, stats, SHA-256 Merkle audit verification, checkpoints save/restore, and diffs.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
-          enum: ['backup', 'stats', 'audit', 'snapshot', 'diff', 'restore'],
+          enum: ['stats', 'audit', 'snapshot', 'diff', 'restore'],
           description: 'Database maintenance operation',
         },
-        name: { type: 'string', description: 'Snapshot or backup name' },
+        name: { type: 'string', description: 'Snapshot name' },
         description: { type: 'string', description: 'Description for snapshot' },
         project: { type: 'string', description: 'Target project slug' },
       },

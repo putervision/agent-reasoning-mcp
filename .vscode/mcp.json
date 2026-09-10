@@ -18,6 +18,46 @@
       "env": {
         "STATE_MEMORY_MCP_PROJECT": "agent-reasoning-mcp"
       }
+    },
+    "vision-memory-mcp": {
+      "type": "stdio",
+      "command": "vision-memory-mcp",
+      "args": [
+        "run"
+      ],
+      "env": {
+        "LANCEDB_PATH": "./.vision-memory-mcp"
+      }
+    },
+    "behavior-mcp": {
+      "type": "stdio",
+      "command": "behavior-mcp",
+      "args": [
+        "run"
+      ],
+      "env": {
+        "BEHAVIOR_PROJECT": "agent-reasoning-mcp"
+      }
+    },
+    "agent-reasoning-mcp": {
+      "type": "stdio",
+      "command": "agent-reasoning-mcp",
+      "args": [
+        "run"
+      ],
+      "env": {
+        "REASONING_PROJECT": "agent-reasoning-mcp"
+      }
+    }
+  },
+  "mcpServers": {
+    "webcrypt": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "webcrypt",
+        "mcp"
+      ]
     }
   }
 }

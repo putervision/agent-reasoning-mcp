@@ -7,7 +7,10 @@ export function registerAllPrompts(server: McpServer): void {
     'Generate comprehensive strategic assessment from active goals, beliefs, and situation snapshot',
     {
       project: z.string().optional().describe('Target project slug'),
-      focus_area: z.string().optional().describe('Specific focus area (e.g. "combat", "economy", "exploration")'),
+      focus_area: z
+        .string()
+        .optional()
+        .describe('Specific focus area (e.g. "combat", "economy", "exploration")'),
     },
     async (args) => {
       const focus = args.focus_area || 'general autonomous operation';

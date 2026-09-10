@@ -23,7 +23,10 @@ export class ReplannerEngine {
     const goal = GoalEngine.getGoal(db, { project: params.project, id: params.goal_id });
 
     // Cancel pending/dispatched intentions linked to this goal
-    const intentions = IntentionEngine.listIntentions(db, { project: params.project, goal_id: goal.id });
+    const intentions = IntentionEngine.listIntentions(db, {
+      project: params.project,
+      goal_id: goal.id,
+    });
     let cancelledCount = 0;
     for (const item of intentions) {
       if (item.status === 'pending' || item.status === 'dispatched') {
@@ -31,7 +34,9 @@ export class ReplannerEngine {
           project: params.project,
           id: item.id,
           status: 'aborted',
-          result: { reason: `Replanning triggered: ${params.blocker_description || 'Reactive event'}` },
+          result: {
+            reason: `Replanning triggered: ${params.blocker_description || 'Reactive event'}`,
+          },
         });
         cancelledCount++;
       }
@@ -39,7 +44,10 @@ export class ReplannerEngine {
 
     // Generate fallback sub-goals
     const fallbackSubgoals = [
-      { title: `Resolve blocker: ${params.blocker_description || 'Investigate obstacle'}`, priority: goal.priority + 0.1 },
+      {
+        title: `Resolve blocker: ${params.blocker_description || 'Investigate obstacle'}`,
+        priority: goal.priority + 0.1,
+      },
       { title: `Resume main objective: ${goal.title}`, priority: goal.priority },
     ];
 

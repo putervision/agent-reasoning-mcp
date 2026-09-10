@@ -18,7 +18,10 @@ export class IntentionEngine {
       parameters?: Record<string, unknown>;
       priority?: number;
       deadline_at?: string;
-      abort_conditions?: Array<{ condition_type: string; condition_params: Record<string, unknown> }>;
+      abort_conditions?: Array<{
+        condition_type: string;
+        condition_params: Record<string, unknown>;
+      }>;
       client_request_id?: string;
     }
   ): Intention {
@@ -39,13 +42,15 @@ export class IntentionEngine {
     const now = getCurrentIsoString();
     const priority = params.priority !== undefined ? params.priority : 0.5;
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO intentions (
         id, project, goal_id, trace_id, session_id, behavior_name,
         parameters_json, priority, status, deadline_at, abort_conditions_json,
         client_request_id, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?)
-    `).run(
+    `
+    ).run(
       id,
       params.project,
       params.goal_id,
@@ -87,11 +92,18 @@ export class IntentionEngine {
     };
   }
 
-  static dispatchIntention(db: Database.Database, params: { project: string; id: string }): Intention {
+  static dispatchIntention(
+    db: Database.Database,
+    params: { project: string; id: string }
+  ): Intention {
     const intention = this.getIntention(db, params);
     const now = getCurrentIsoString();
 
-    db.prepare('UPDATE intentions SET status = ?, updated_at = ? WHERE id = ?').run('dispatched', now, intention.id);
+    db.prepare('UPDATE intentions SET status = ?, updated_at = ? WHERE id = ?').run(
+      'dispatched',
+      now,
+      intention.id
+    );
 
     logReasoningEvent(db, {
       project: params.project,
@@ -116,12 +128,9 @@ export class IntentionEngine {
     const intention = this.getIntention(db, params);
     const now = getCurrentIsoString();
 
-    db.prepare('UPDATE intentions SET status = ?, result_json = ?, updated_at = ? WHERE id = ?').run(
-      params.status,
-      safeJsonStringify(params.result || {}),
-      now,
-      intention.id
-    );
+    db.prepare(
+      'UPDATE intentions SET status = ?, result_json = ?, updated_at = ? WHERE id = ?'
+    ).run(params.status, safeJsonStringify(params.result || {}), now, intention.id);
 
     logReasoningEvent(db, {
       project: params.project,
@@ -135,7 +144,9 @@ export class IntentionEngine {
   }
 
   static getIntention(db: Database.Database, params: { project: string; id: string }): Intention {
-    const row = db.prepare('SELECT * FROM intentions WHERE project = ? AND id = ?').get(params.project, params.id) as any;
+    const row = db
+      .prepare('SELECT * FROM intentions WHERE project = ? AND id = ?')
+      .get(params.project, params.id) as any;
     if (!row) throw new NotFoundError(`Intention ${params.id} not found.`);
     return this.mapRowToIntention(row);
   }

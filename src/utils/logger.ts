@@ -8,7 +8,9 @@ export const LOG_LEVELS: Record<LogLevel, number> = {
 };
 
 export function getLogLevel(): number {
-  const envLevel = (process.env.REASONING_LOG_LEVEL || process.env.AGENT_REASONING_MCP_LOG_LEVEL)?.toLowerCase() as LogLevel | undefined;
+  const envLevel = (
+    process.env.REASONING_LOG_LEVEL || process.env.AGENT_REASONING_MCP_LOG_LEVEL
+  )?.toLowerCase() as LogLevel | undefined;
   if (envLevel && envLevel in LOG_LEVELS) {
     return LOG_LEVELS[envLevel];
   }

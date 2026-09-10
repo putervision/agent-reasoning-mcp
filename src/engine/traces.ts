@@ -1,5 +1,11 @@
 import Database from 'better-sqlite3';
-import { DecisionTrace, TraceId, CandidateAction, RiskAssessmentResult, GoalId } from '../schema/types.js';
+import {
+  DecisionTrace,
+  TraceId,
+  CandidateAction,
+  RiskAssessmentResult,
+  GoalId,
+} from '../schema/types.js';
 import { generateId } from '../utils/id.js';
 import { getCurrentIsoString } from '../utils/time.js';
 import { safeJsonParse, safeJsonStringify } from '../utils/json-validator.js';
@@ -31,13 +37,15 @@ export class DecisionTraceEngine {
     const id = generateId() as TraceId;
     const now = getCurrentIsoString();
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO decision_traces (
         id, project, session_id, goal_id, situation_summary, candidate_actions_json,
         utility_profile, chosen_action, reasoning_chain_json, risk_assessment_json,
         outcome, latency_ms, metadata_json, created_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
+    `
+    ).run(
       id,
       params.project,
       params.session_id ?? null,
@@ -81,7 +89,9 @@ export class DecisionTraceEngine {
   }
 
   static getTrace(db: Database.Database, params: { project: string; id: string }): DecisionTrace {
-    const row = db.prepare('SELECT * FROM decision_traces WHERE project = ? AND id = ?').get(params.project, params.id) as any;
+    const row = db
+      .prepare('SELECT * FROM decision_traces WHERE project = ? AND id = ?')
+      .get(params.project, params.id) as any;
     if (!row) throw new NotFoundError(`Decision trace ${params.id} not found.`);
     return this.mapRowToTrace(row);
   }
@@ -106,7 +116,9 @@ export class DecisionTraceEngine {
   }
 
   static getLatestTrace(db: Database.Database, project: string): DecisionTrace | null {
-    const row = db.prepare('SELECT * FROM decision_traces WHERE project = ? ORDER BY created_at DESC LIMIT 1').get(project) as any;
+    const row = db
+      .prepare('SELECT * FROM decision_traces WHERE project = ? ORDER BY created_at DESC LIMIT 1')
+      .get(project) as any;
     if (!row) return null;
     return this.mapRowToTrace(row);
   }

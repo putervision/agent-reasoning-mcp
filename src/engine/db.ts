@@ -85,6 +85,9 @@ export function sanitizeSlug(str: string): string {
 }
 
 export function resolveProjectRoot(project?: string, cwd = process.cwd()): string {
+  const currentCwd = path.resolve(cwd);
+
+  // 1. Explicit project parameter lookup
   if (project) {
     const registry = getRegistry();
     const slug = sanitizeSlug(project);
@@ -96,18 +99,60 @@ export function resolveProjectRoot(project?: string, cwd = process.cwd()): strin
     }
   }
 
-  let curr = path.resolve(cwd);
+  // 2. Exact match in registry for current CWD
+  const registry = getRegistry();
+  for (const [, projectPath] of Object.entries(registry)) {
+    const resolvedPath = path.resolve(projectPath);
+    if (resolvedPath === currentCwd && fs.existsSync(resolvedPath)) {
+      return resolvedPath;
+    }
+  }
+
+  // 3. If current directory has own package.json or local MCP marker, it is its own project root
+  if (
+    fs.existsSync(path.join(currentCwd, '.agent-reasoning-mcp')) ||
+    fs.existsSync(path.join(currentCwd, '.state-memory-mcp')) ||
+    fs.existsSync(path.join(currentCwd, '.world-model-mcp')) ||
+    fs.existsSync(path.join(currentCwd, '.vision-memory-mcp')) ||
+    fs.existsSync(path.join(currentCwd, 'package.json'))
+  ) {
+    return currentCwd;
+  }
+
+  // 4. Longest matching registered ancestor directory (excluding homedir)
+  let bestMatch: string | undefined;
+  for (const [, projectPath] of Object.entries(registry)) {
+    const resolvedPath = path.resolve(projectPath);
+    if (resolvedPath === os.homedir()) continue;
+    if (currentCwd.startsWith(resolvedPath + path.sep)) {
+      if (fs.existsSync(resolvedPath)) {
+        if (!bestMatch || resolvedPath.length > bestMatch.length) {
+          bestMatch = resolvedPath;
+        }
+      }
+    }
+  }
+  if (bestMatch) {
+    return bestMatch;
+  }
+
+  // 5. Walk up directory tree to find project markers
+  let curr = currentCwd;
   const home = os.homedir();
   while (curr !== path.dirname(curr) && curr !== home) {
     if (
-      fs.existsSync(path.join(curr, '.git')) ||
-      fs.existsSync(path.join(curr, '.agent-reasoning-mcp'))
+      fs.existsSync(path.join(curr, '.agent-reasoning-mcp')) ||
+      fs.existsSync(path.join(curr, '.state-memory-mcp')) ||
+      fs.existsSync(path.join(curr, '.world-model-mcp')) ||
+      fs.existsSync(path.join(curr, '.vision-memory-mcp')) ||
+      fs.existsSync(path.join(curr, 'package.json')) ||
+      fs.existsSync(path.join(curr, '.git'))
     ) {
       return curr;
     }
     curr = path.dirname(curr);
   }
-  return path.resolve(cwd);
+  return currentCwd;
 }
 
 export function getProjectSlug(project?: string, cwd = process.cwd()): string {
@@ -128,7 +173,10 @@ export function getBaseDir(projectRoot: string): string {
     return path.resolve(projectRoot, config.storagePath);
   }
   if (process.env.REASONING_MCP_DIR || process.env.AGENT_REASONING_MCP_DIR) {
-    return path.resolve(projectRoot, (process.env.REASONING_MCP_DIR || process.env.AGENT_REASONING_MCP_DIR)!);
+    return path.resolve(
+      projectRoot,
+      (process.env.REASONING_MCP_DIR || process.env.AGENT_REASONING_MCP_DIR)!
+    );
   }
   return path.join(projectRoot, '.agent-reasoning-mcp');
 }
@@ -235,7 +283,9 @@ export function getReadOnlyDb(project?: string, cwd = process.cwd()): Database.D
     readOnlyDbCache.set(dbPath, db);
     return db;
   } catch (err: any) {
-    throw new DatabaseError(`Failed to open read-only reasoning database at ${dbPath}: ${err.message}`);
+    throw new DatabaseError(
+      `Failed to open read-only reasoning database at ${dbPath}: ${err.message}`
+    );
   }
 }
 

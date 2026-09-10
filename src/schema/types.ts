@@ -8,7 +8,8 @@ export type SnapshotId = string & { readonly __brand: unique symbol };
 export type EventId = string & { readonly __brand: unique symbol };
 
 export type GoalStatus = 'active' | 'completed' | 'failed' | 'abandoned' | 'suspended';
-export type IntentionStatus = 'pending' | 'dispatched' | 'running' | 'completed' | 'failed' | 'aborted' | 'interrupted';
+export type IntentionStatus =
+  'pending' | 'dispatched' | 'running' | 'completed' | 'failed' | 'aborted' | 'interrupted';
 export type BeliefCategory = 'spatial' | 'entity' | 'state' | 'rule' | 'social';
 
 export interface Goal {
@@ -156,9 +157,14 @@ export interface ReasoningEvent {
 
 export interface SituationSnapshot {
   session_id: string;
-  timestamp: string;
+  timestamp?: string;
   world?: {
-    entities: Array<{ id: string; type: string; position: [number, number, number]; status: string }>;
+    entities: Array<{
+      id: string;
+      type: string;
+      position: [number, number, number];
+      status: string;
+    }>;
     relations?: Array<{ source: string; relation: string; target: string }>;
     observer_position?: [number, number, number];
   };
@@ -167,9 +173,11 @@ export interface SituationSnapshot {
     description?: string;
     grounded_elements?: Array<{ selector: string; label: string }>;
   };
-  state: {
-    active_goals: Array<{ id: string; title: string; priority: number }>;
-    blockers: Array<{ id: string; description: string }>;
+  state?: {
+    tasks?: Array<{ id: string; title: string; status?: string; priority?: number }>;
+    active_goals?: Array<{ id: string; title: string; priority: number }>;
+    blockers?: Array<{ id: string; description: string }>;
+    decisions?: Array<{ id: string; recommendation: string }>;
     recent_decisions?: Array<{ id: string; recommendation: string }>;
   };
   vitals?: {

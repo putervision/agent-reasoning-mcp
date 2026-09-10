@@ -40,20 +40,30 @@ export class BeliefEngine {
 
     // Check if belief with same category, subject, predicate exists
     const existing = db
-      .prepare('SELECT * FROM beliefs WHERE project = ? AND category = ? AND subject = ? AND predicate = ?')
+      .prepare(
+        'SELECT * FROM beliefs WHERE project = ? AND category = ? AND subject = ? AND predicate = ?'
+      )
       .get(params.project, params.category, params.subject, params.predicate) as any;
 
     const now = getCurrentIsoString();
-    const confidence = params.confidence !== undefined ? Math.max(0, Math.min(1, params.confidence)) : 1.0;
-    const decay_rate = params.decay_rate !== undefined ? params.decay_rate : (params.category === 'spatial' ? 0.2 : 0.05);
+    const confidence =
+      params.confidence !== undefined ? Math.max(0, Math.min(1, params.confidence)) : 1.0;
+    const decay_rate =
+      params.decay_rate !== undefined
+        ? params.decay_rate
+        : params.category === 'spatial'
+          ? 0.2
+          : 0.05;
 
     if (existing) {
-      db.prepare(`
+      db.prepare(
+        `
         UPDATE beliefs SET
           object_json = ?, confidence = ?, source = ?, source_id = ?,
           expires_at = ?, decay_rate = ?, last_decayed_at = ?, metadata_json = ?, updated_at = ?
         WHERE id = ?
-      `).run(
+      `
+      ).run(
         safeJsonStringify(params.object),
         confidence,
         params.source || existing.source,
@@ -78,13 +88,15 @@ export class BeliefEngine {
     }
 
     const id = generateId() as BeliefId;
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO beliefs (
         id, project, session_id, category, subject, predicate, object_json,
         confidence, source, source_id, expires_at, decay_rate, last_decayed_at,
         client_request_id, metadata_json, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
+    `
+    ).run(
       id,
       params.project,
       params.session_id ?? null,
@@ -175,10 +187,14 @@ export class BeliefEngine {
 
   static decayBeliefs(db: Database.Database, project: string): void {
     const now = Date.now();
-    const rows = db.prepare('SELECT id, confidence, decay_rate, last_decayed_at FROM beliefs WHERE project = ?').all(project) as any[];
+    const rows = db
+      .prepare('SELECT id, confidence, decay_rate, last_decayed_at FROM beliefs WHERE project = ?')
+      .all(project) as any[];
 
     db.transaction(() => {
-      const updateStmt = db.prepare('UPDATE beliefs SET confidence = ?, last_decayed_at = ? WHERE id = ?');
+      const updateStmt = db.prepare(
+        'UPDATE beliefs SET confidence = ?, last_decayed_at = ? WHERE id = ?'
+      );
       for (const row of rows) {
         if (!row.last_decayed_at) continue;
         const elapsedHours = (now - new Date(row.last_decayed_at).getTime()) / (1000 * 60 * 60);
@@ -193,12 +209,18 @@ export class BeliefEngine {
 
   static expireBeliefs(db: Database.Database, project: string): number {
     const now = getCurrentIsoString();
-    const res = db.prepare('DELETE FROM beliefs WHERE project = ? AND expires_at IS NOT NULL AND expires_at < ?').run(project, now);
+    const res = db
+      .prepare(
+        'DELETE FROM beliefs WHERE project = ? AND expires_at IS NOT NULL AND expires_at < ?'
+      )
+      .run(project, now);
     return res.changes;
   }
 
   static getBelief(db: Database.Database, params: { project: string; id: string }): Belief {
-    const row = db.prepare('SELECT * FROM beliefs WHERE project = ? AND id = ?').get(params.project, params.id) as any;
+    const row = db
+      .prepare('SELECT * FROM beliefs WHERE project = ? AND id = ?')
+      .get(params.project, params.id) as any;
     if (!row) throw new NotFoundError(`Belief ${params.id} not found.`);
     return this.mapRowToBelief(row);
   }

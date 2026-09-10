@@ -12,11 +12,15 @@ export const SetGoalSchema = z.object({
   deadline_at: z.string().optional(),
   progress: z.number().min(0).max(1).optional(),
   success_criteria: z.array(z.string()).optional(),
-  subgoals: z.array(z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    priority: z.number().optional(),
-  })).optional(),
+  subgoals: z
+    .array(
+      z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        priority: z.number().optional(),
+      })
+    )
+    .optional(),
   client_request_id: z.string().optional(),
   project: z.string().optional(),
   limit: z.number().optional(),
@@ -24,20 +28,26 @@ export const SetGoalSchema = z.object({
 
 export const EvaluateSituationSchema = z.object({
   action: z.enum(['snapshot', 'quick']),
-  snapshot: z.object({
-    session_id: z.string(),
-    timestamp: z.string().optional(),
-    world: z.any().optional(),
-    vision: z.any().optional(),
-    state: z.any().optional(),
-    vitals: z.any().optional(),
-  }).optional(),
+  snapshot: z
+    .object({
+      session_id: z.string(),
+      timestamp: z.string().optional(),
+      world: z.any().optional(),
+      vision: z.any().optional(),
+      state: z.any().optional(),
+      vitals: z.any().optional(),
+    })
+    .optional(),
   quick_context: z.string().optional(),
-  candidate_actions: z.array(z.object({
-    action: z.string(),
-    parameters: z.record(z.any()).optional(),
-    description: z.string().optional(),
-  })).optional(),
+  candidate_actions: z
+    .array(
+      z.object({
+        action: z.string(),
+        parameters: z.record(z.any()).optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
   utility_profile: z.string().optional(),
   project: z.string().optional(),
 });
@@ -55,10 +65,14 @@ export const AssessRiskSchema = z.object({
   action: z.enum(['action', 'plan', 'compare']),
   candidate_action: z.string().optional(),
   parameters: z.record(z.any()).optional(),
-  candidate_actions: z.array(z.object({
-    action: z.string(),
-    parameters: z.record(z.any()).optional(),
-  })).optional(),
+  candidate_actions: z
+    .array(
+      z.object({
+        action: z.string(),
+        parameters: z.record(z.any()).optional(),
+      })
+    )
+    .optional(),
   situation_context: z.any().optional(),
   project: z.string().optional(),
 });
@@ -115,7 +129,9 @@ export const ManageIntentionsSchema = z.object({
   deadline_at: z.string().optional(),
   abort_conditions: z.array(z.any()).optional(),
   result: z.record(z.any()).optional(),
-  status: z.enum(['pending', 'dispatched', 'running', 'completed', 'failed', 'aborted', 'interrupted']).optional(),
+  status: z
+    .enum(['pending', 'dispatched', 'running', 'completed', 'failed', 'aborted', 'interrupted'])
+    .optional(),
   client_request_id: z.string().optional(),
   project: z.string().optional(),
 });
