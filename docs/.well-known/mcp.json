@@ -1,12 +1,12 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.putervision/agent-reasoning-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "title": "Agent Reasoning MCP",
   "description": "Strategic BDI reasoning engine for autonomous AI agents — goals, utility, and replanning.",
   "publisher": "PuterVision",
   "license": "MIT",
-  "websiteUrl": "https://putervision.com",
+  "websiteUrl": "https://reasoningmcp.com",
   "status": "active",
   "icons": [
     {
@@ -29,7 +29,7 @@
     {
       "registryType": "npm",
       "identifier": "@putervision/agent-reasoning-mcp",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "transport": {
         "type": "stdio"
       },

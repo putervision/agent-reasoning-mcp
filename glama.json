@@ -2,13 +2,13 @@
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "agent-reasoning-mcp",
   "title": "Agent Reasoning MCP",
-  "description": "Strategic BDI reasoning engine for autonomous AI agents \u2014 goals, utility, and replanning.",
+  "description": "Strategic BDI reasoning engine for autonomous AI agents — goals, utility, and replanning.",
   "maintainers": [
     "putervision"
   ],
   "author": "PuterVision",
   "license": "MIT",
-  "homepage": "https://putervision.com",
+  "homepage": "https://agentreasoningmcp.com",
   "repository": "https://github.com/putervision/agent-reasoning-mcp",
   "categories": [
     "developer-tools",

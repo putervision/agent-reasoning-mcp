@@ -1,12 +1,12 @@
 {
   "manifest_version": "0.2",
   "name": "@putervision/agent-reasoning-mcp",
-  "version": "0.1.1",
-  "description": "Strategic BDI reasoning engine for autonomous AI agents \u2014 goals, utility, and replanning.",
+  "version": "0.1.2",
+  "description": "Strategic BDI reasoning engine for autonomous AI agents — goals, utility, and replanning.",
   "author": {
     "name": "PuterVision"
   },
-  "homepage": "https://github.com/putervision/agent-reasoning-mcp#readme",
+  "homepage": "https://agentreasoningmcp.com",
   "server": {
     "type": "node",
     "entry_point": "./dist/index.js",
