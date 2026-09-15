@@ -44,4 +44,39 @@ describe('BeliefEngine', () => {
     const queried = BeliefEngine.queryBeliefs(db, { project: 'test' });
     expect(queried[0].confidence).toBeLessThanOrEqual(1.0);
   });
+
+  it('queries beliefs with predicate, min_confidence, and limit filters', () => {
+    BeliefEngine.updateBelief(db, {
+      project: 'test',
+      category: 'entity',
+      subject: 'target_alpha',
+      predicate: 'is_active',
+      object: true,
+      confidence: 0.85,
+    });
+    BeliefEngine.updateBelief(db, {
+      project: 'test',
+      category: 'entity',
+      subject: 'target_beta',
+      predicate: 'is_active',
+      object: false,
+      confidence: 0.4,
+    });
+
+    const activeHigh = BeliefEngine.queryBeliefs(db, {
+      project: 'test',
+      predicate: 'is_active',
+      min_confidence: 0.8,
+    });
+    expect(activeHigh).toHaveLength(1);
+    expect(activeHigh[0].subject).toBe('target_alpha');
+
+    const activeLow = BeliefEngine.queryBeliefs(db, {
+      project: 'test',
+      predicate: 'is_active',
+      min_confidence: 0.3,
+      limit: 1,
+    });
+    expect(activeLow).toHaveLength(1);
+  });
 });

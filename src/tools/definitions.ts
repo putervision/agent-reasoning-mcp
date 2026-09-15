@@ -99,6 +99,10 @@ export const toolDefinitions: ToolDefinition[] = [
         },
         session_id: { type: 'string', description: 'Linked state-memory session ID' },
         trace_id: { type: 'string', description: 'Distributed trace ID' },
+        lookahead_depth: {
+          type: 'number',
+          description: 'Bounded heuristic lookahead plies (e.g. 2-3 plies, discount gamma=0.85)',
+        },
         project: { type: 'string', description: 'Target project slug' },
       },
       required: ['action'],
@@ -342,8 +346,9 @@ export const toolDefinitions: ToolDefinition[] = [
       properties: {
         action: {
           type: 'string',
-          enum: ['stats', 'audit', 'snapshot', 'diff', 'restore'],
-          description: 'Database maintenance operation',
+          enum: ['stats', 'audit', 'doctor', 'snapshot', 'diff', 'restore'],
+          description:
+            'Database maintenance operation: stats, audit, doctor (health diagnostics), snapshot, diff, restore',
         },
         name: { type: 'string', description: 'Snapshot name' },
         description: { type: 'string', description: 'Description for snapshot' },

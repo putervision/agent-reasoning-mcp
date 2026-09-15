@@ -23,11 +23,13 @@ describe('agent-reasoning-mcp Exhaustive MCP Handlers Integration Suite', () => 
     vi.spyOn(dbModule, 'getDb').mockReturnValue(db);
     vi.spyOn(dbModule, 'getReadOnlyDb').mockReturnValue(db);
     vi.spyOn(dbModule, 'getProjectSlug').mockReturnValue(project);
+    process.env.AGENT_REASONING_MCP_PROJECT = project;
 
     registerAllTools(mockServer as any);
   });
 
   afterEach(() => {
+    delete process.env.AGENT_REASONING_MCP_PROJECT;
     vi.restoreAllMocks();
     db.close();
   });

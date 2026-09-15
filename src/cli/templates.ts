@@ -54,7 +54,7 @@ export function getMcpConfigCursor(projectSlug: string): Record<string, unknown>
         command: 'agent-reasoning-mcp',
         args: ['run'],
         env: {
-          REASONING_PROJECT: projectSlug,
+          AGENT_REASONING_MCP_PROJECT: projectSlug,
         },
       },
     },
@@ -69,7 +69,7 @@ export function getMcpConfigVscode(projectSlug: string): Record<string, unknown>
         command: 'agent-reasoning-mcp',
         args: ['run'],
         env: {
-          REASONING_PROJECT: projectSlug,
+          AGENT_REASONING_MCP_PROJECT: projectSlug,
         },
       },
     },

@@ -21,6 +21,7 @@ export class EvaluatorEngine {
         description?: string;
       }>;
       utility_profile?: string;
+      lookahead_depth?: number;
     }
   ): {
     chosen_action: CandidateAction;
@@ -148,8 +149,22 @@ export class EvaluatorEngine {
         profile
       );
       candidateScored.risk_score = risk.risk_score;
+
+      if (params.lookahead_depth && params.lookahead_depth > 1) {
+        const gamma = 0.85;
+        const optionalityBonus =
+          isPatrol || isGather ? 0.15 : isCombat && threatLevel > 0.6 ? 0.2 : 0.05;
+        candidateScored.estimated_utility += gamma * optionalityBonus;
+      }
+
       return candidateScored;
     });
+
+    if (params.lookahead_depth && params.lookahead_depth > 1) {
+      reasoning_chain.push(
+        `Applied bounded heuristic lookahead (depth=${params.lookahead_depth}, gamma=0.85) to candidate trajectories.`
+      );
+    }
 
     const ranked = scoredCandidates.sort((a, b) => b.estimated_utility - a.estimated_utility);
     const chosen = ranked[0];

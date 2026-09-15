@@ -1,18 +1,33 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { z } from 'zod';
+export function registerAllPrompts(server: any): void {
+  const registerPrompt = (
+    name: string,
+    metadata: { title: string; description: string; argsSchema?: Record<string, any> },
+    handler: (args: any, extra?: { signal?: AbortSignal }) => Promise<any> | any
+  ) => {
+    if (typeof server.registerPrompt === 'function') {
+      server.registerPrompt(name, metadata, handler);
+    } else if (typeof server.prompt === 'function') {
+      server.prompt(name, metadata.description, metadata.argsSchema || {}, handler);
+    }
+  };
 
-export function registerAllPrompts(server: McpServer): void {
-  server.prompt(
+  registerPrompt(
     'strategic-assessment',
-    'Generate comprehensive strategic assessment from active goals, beliefs, and situation snapshot',
     {
-      project: z.string().optional().describe('Target project slug'),
-      focus_area: z
-        .string()
-        .optional()
-        .describe('Specific focus area (e.g. "combat", "economy", "exploration")'),
+      title: 'Strategic Assessment',
+      description:
+        'Generate comprehensive strategic assessment from active goals, beliefs, and situation snapshot',
+      argsSchema: {
+        properties: {
+          project: { type: 'string', description: 'Target project slug' },
+          focus_area: {
+            type: 'string',
+            description: 'Specific focus area (e.g. "combat", "economy", "exploration")',
+          },
+        },
+      },
     },
-    async (args) => {
+    async (args: any) => {
       const focus = args.focus_area || 'general autonomous operation';
       return {
         messages: [
@@ -28,14 +43,21 @@ export function registerAllPrompts(server: McpServer): void {
     }
   );
 
-  server.prompt(
+  registerPrompt(
     'goal-planning',
-    'Decompose high-level strategic objectives into structured sub-goal DAGs with verifiable success criteria',
     {
-      objective: z.string().describe('High-level mission objective to plan'),
-      priority: z.string().optional().describe('Priority level (0.0 to 1.0)'),
+      title: 'Goal Planning',
+      description:
+        'Decompose high-level strategic objectives into structured sub-goal DAGs with verifiable success criteria',
+      argsSchema: {
+        properties: {
+          objective: { type: 'string', description: 'High-level mission objective to plan' },
+          priority: { type: 'string', description: 'Priority level (0.0 to 1.0)' },
+        },
+        required: ['objective'],
+      },
     },
-    async (args) => {
+    async (args: any) => {
       return {
         messages: [
           {
@@ -50,14 +72,23 @@ export function registerAllPrompts(server: McpServer): void {
     }
   );
 
-  server.prompt(
+  registerPrompt(
     'risk-evaluation',
-    'Perform quantitative threat and opportunity analysis for proposed action plans',
     {
-      proposed_action: z.string().describe('Proposed behavior or action plan'),
-      threat_context: z.string().optional().describe('Known environmental threats or constraints'),
+      title: 'Risk Evaluation',
+      description: 'Perform quantitative threat and opportunity analysis for proposed action plans',
+      argsSchema: {
+        properties: {
+          proposed_action: { type: 'string', description: 'Proposed behavior or action plan' },
+          threat_context: {
+            type: 'string',
+            description: 'Known environmental threats or constraints',
+          },
+        },
+        required: ['proposed_action'],
+      },
     },
-    async (args) => {
+    async (args: any) => {
       return {
         messages: [
           {
@@ -72,13 +103,20 @@ export function registerAllPrompts(server: McpServer): void {
     }
   );
 
-  server.prompt(
+  registerPrompt(
     'post-mortem',
-    'Analyze decision trace and outcome results to extract heuristic knowledge patterns and lessons learned',
     {
-      trace_id: z.string().describe('Decision trace ID to analyze'),
+      title: 'Post-Mortem',
+      description:
+        'Analyze decision trace and outcome results to extract heuristic knowledge patterns and lessons learned',
+      argsSchema: {
+        properties: {
+          trace_id: { type: 'string', description: 'Decision trace ID to analyze' },
+        },
+        required: ['trace_id'],
+      },
     },
-    async (args) => {
+    async (args: any) => {
       return {
         messages: [
           {

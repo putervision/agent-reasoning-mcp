@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+Allow: /llms.txt
+Allow: /.well-known/mcp.json
+
+# AI Crawlers & LLM Agents
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+Sitemap: https://agentreasoningmcp.com/sitemap.xml
+# LLM Context & MCP Discovery
+# https://agentreasoningmcp.com/llms.txt
+# https://agentreasoningmcp.com/.well-known/mcp.json

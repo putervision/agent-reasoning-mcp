@@ -1,5 +1,4 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { z } from 'zod';
+import { McpError, ErrorCode, NativeMcpServer } from '../transport/native-mcp.js';
 import { toolDefinitions, READ_ONLY_TOOLS } from './definitions.js';
 import { getDb, getReadOnlyDb, getProjectSlug } from '../engine/db.js';
 import { GoalEngine } from '../engine/goals.js';
@@ -15,6 +14,7 @@ import { SnapshotEngine } from '../engine/snapshots.js';
 import { verifyEventChain } from '../engine/events.js';
 import { SchemaAdvisor } from '../engine/advisor.js';
 import { ValidationError } from '../utils/errors.js';
+import { z, Schema, ObjectSchema } from '../schema/schemas.js';
 
 interface JsonSchemaProperty {
   type?: string;
@@ -26,7 +26,7 @@ interface JsonSchemaProperty {
   [key: string]: unknown;
 }
 
-export function jsonSchemaToZod(schema: JsonSchemaProperty | unknown): z.ZodTypeAny {
+export function jsonSchemaToZod(schema: JsonSchemaProperty | unknown): Schema<any> {
   if (!schema || typeof schema !== 'object') return z.unknown();
   const s = schema as JsonSchemaProperty;
 
@@ -43,7 +43,7 @@ export function jsonSchemaToZod(schema: JsonSchemaProperty | unknown): z.ZodType
     return z.array(itemSchema);
   }
   if (s.type === 'object' || s.properties) {
-    const shape: Record<string, z.ZodTypeAny> = {};
+    const shape: Record<string, Schema<any>> = {};
     const requiredKeys = new Set(s.required || []);
     if (s.properties) {
       for (const [key, prop] of Object.entries(s.properties)) {
@@ -59,27 +59,46 @@ export function jsonSchemaToZod(schema: JsonSchemaProperty | unknown): z.ZodType
   return z.unknown();
 }
 
-export function registerAllTools(server: McpServer): void {
+export function jsonSchemaToZodObject(schema: any): any {
+  const zod = jsonSchemaToZod(schema);
+  if (zod instanceof ObjectSchema) {
+    return zod;
+  }
+  return z.object({}).passthrough();
+}
+
+export function registerAllTools(server: any): void {
   const toolNames = toolDefinitions.map((t) => t.name);
 
   for (const def of toolDefinitions) {
-    const zodShape: Record<string, z.ZodTypeAny> = {};
-    const schemaProps = (def.inputSchema.properties || {}) as Record<string, JsonSchemaProperty>;
-    const requiredList = new Set((def.inputSchema.required as string[]) || []);
+    const title = def.name
+      .split('_')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
 
-    for (const [key, prop] of Object.entries(schemaProps)) {
-      let fieldSchema = jsonSchemaToZod(prop);
-      if (!requiredList.has(key)) {
-        fieldSchema = fieldSchema.optional();
-      }
-      zodShape[key] = fieldSchema;
+    const isReadOnly = READ_ONLY_TOOLS.has(def.name);
+    const effectiveSchema = JSON.parse(JSON.stringify(def.inputSchema));
+    if (effectiveSchema.properties?.action) {
+      delete effectiveSchema.properties.action.enum;
     }
 
-    server.tool(def.name, def.description, zodShape, async (args: any) => {
+    const toolHandler = async (args: any, extra?: { signal?: AbortSignal }) => {
       try {
-        const project = getProjectSlug(args.project);
-        const isReadOnly = READ_ONLY_TOOLS.has(def.name);
-        const db = isReadOnly ? getReadOnlyDb(project) : getDb(project);
+        const projectSlug =
+          args?.project ||
+          process.env.AGENT_REASONING_MCP_PROJECT ||
+          process.env.REASONING_PROJECT ||
+          process.env.PV_PROJECT;
+        if (!projectSlug || String(projectSlug).trim() === '') {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            `Parameter "project" is required for tool "${def.name}". Provide the "project" parameter or set the AGENT_REASONING_MCP_PROJECT environment variable.`
+          );
+        }
+        const project = getProjectSlug(String(projectSlug).trim());
+        if (args) args.project = project;
+        const isReadOnlyDb = READ_ONLY_TOOLS.has(def.name);
+        const db = isReadOnlyDb ? getReadOnlyDb(project) : getDb(project);
 
         let result: any;
 
@@ -316,6 +335,19 @@ export function registerAllTools(server: McpServer): void {
               result = { goalsCount, beliefsCount, tracesCount, intentionsCount, project };
             } else if (action === 'audit') {
               result = verifyEventChain(db, project);
+            } else if (action === 'doctor') {
+              const audit = verifyEventChain(db, project);
+              const integrity = db.pragma('integrity_check');
+              const journal = db.pragma('journal_mode');
+              result = {
+                status: audit.valid ? 'healthy' : 'unhealthy',
+                valid: audit.valid,
+                database_accessibility: 'OK',
+                journal_mode: journal,
+                integrity_check: integrity,
+                event_chain: audit,
+                project,
+              };
             } else if (action === 'snapshot') {
               result = SnapshotEngine.saveSnapshot(db, {
                 project,
@@ -328,7 +360,7 @@ export function registerAllTools(server: McpServer): void {
               result = SnapshotEngine.listSnapshots(db, { project });
             } else {
               throw new ValidationError(
-                `Unsupported manage_reasoning_db action: "${action}". Supported actions: stats, audit, snapshot, restore, diff.`
+                `Unsupported manage_reasoning_db action: "${action}". Supported actions: stats, audit, doctor, snapshot, restore, diff.`
               );
             }
             break;
@@ -347,6 +379,12 @@ export function registerAllTools(server: McpServer): void {
           ],
         };
       } catch (error: any) {
+        if (
+          error instanceof McpError ||
+          (error && typeof error === 'object' && error.code === ErrorCode.InvalidParams)
+        ) {
+          throw error;
+        }
         const advice = SchemaAdvisor.getAdvice(def.name, error.message, toolNames);
         return {
           isError: true,
@@ -366,6 +404,26 @@ export function registerAllTools(server: McpServer): void {
           ],
         };
       }
-    });
+    };
+
+    if (typeof server.registerTool === 'function') {
+      server.registerTool(
+        def.name,
+        {
+          title,
+          description: def.description,
+          inputSchema: effectiveSchema,
+          rawJsonSchema: effectiveSchema,
+          annotations: {
+            readOnlyHint: isReadOnly,
+            destructiveHint: false,
+            openWorldHint: false,
+          },
+        },
+        toolHandler
+      );
+    } else if (typeof server.tool === 'function') {
+      server.tool(def.name, def.description, effectiveSchema, toolHandler);
+    }
   }
 }

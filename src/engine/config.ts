@@ -1,24 +1,29 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { z } from 'zod';
 import { logger } from '../utils/logger.js';
 
-export const ProjectConfigSchema = z
-  .object({
-    projectName: z.string().optional(),
-    defaultBranch: z.string().optional(),
-    storagePath: z.string().optional(),
-    allowedExportDirs: z.array(z.string()).optional(),
-    busyTimeoutMs: z.number().int().positive().optional(),
-    mmapSizeBytes: z.number().int().positive().optional(),
-    beliefDecayRate: z.number().min(0).max(1).optional(),
-    spatialTtlMs: z.number().int().positive().optional(),
-    maxGoalDepth: z.number().int().positive().optional(),
-    accessMode: z.enum(['normal', 'read_only']).optional(),
-  })
-  .passthrough();
+export interface ProjectConfig {
+  projectName?: string;
+  defaultBranch?: string;
+  storagePath?: string;
+  allowedExportDirs?: string[];
+  busyTimeoutMs?: number;
+  mmapSizeBytes?: number;
+  beliefDecayRate?: number;
+  spatialTtlMs?: number;
+  maxGoalDepth?: number;
+  accessMode?: 'normal' | 'read_only';
+  [key: string]: any;
+}
 
-export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;
+export const ProjectConfigSchema = {
+  safeParse(val: unknown): { success: boolean; data?: ProjectConfig; error?: { message: string } } {
+    if (!val || typeof val !== 'object' || Array.isArray(val)) {
+      return { success: false, error: { message: 'Expected object' } };
+    }
+    return { success: true, data: val as ProjectConfig };
+  },
+};
 
 const cachedConfigs = new Map<string, { config: ProjectConfig; timestamp: number }>();
 const CONFIG_TTL_MS = 2000;
@@ -39,10 +44,10 @@ export function loadProjectConfig(projectRoot: string): ProjectConfig {
       const raw = fs.readFileSync(configPath, 'utf-8');
       const parsed = JSON.parse(raw);
       const validated = ProjectConfigSchema.safeParse(parsed);
-      if (validated.success) {
+      if (validated.success && validated.data) {
         config = validated.data;
       } else {
-        logger.warn(`Invalid .agent-reasoning-mcp.json schema: ${validated.error.message}`);
+        logger.warn(`Invalid .agent-reasoning-mcp.json schema: ${validated.error?.message}`);
         config = parsed;
       }
     } catch (err: any) {

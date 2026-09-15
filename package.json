@@ -1,7 +1,7 @@
 {
   "name": "@putervision/agent-reasoning-mcp",
-  "version": "0.1.2",
-  "description": "Strategic BDI reasoning engine for autonomous AI agents \u2014 goal decomposition, utility scoring, risk evaluation, and reactive replanning over PuterVision memory and world models.",
+  "version": "0.2.0",
+  "description": "Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, utility scoring, risk evaluation, and reactive replanning over PuterVision memory and world models.",
   "keywords": [
     "mcp",
     "mcp-server",
@@ -91,9 +91,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4",
-    "better-sqlite3": "^11.0.0",
-    "zod": "^3.23.8"
+    "better-sqlite3": "^11.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
