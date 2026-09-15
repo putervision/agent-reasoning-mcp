@@ -1,6 +1,7 @@
 # @putervision/agent-reasoning-mcp
 
 [![npm version](https://img.shields.io/npm/v/@putervision/agent-reasoning-mcp.svg)](https://www.npmjs.com/package/@putervision/agent-reasoning-mcp)
+[![version](https://img.shields.io/badge/version-0.2.1-blue.svg)](./CHANGELOG.md)
 [![CI](https://github.com/putervision/agent-reasoning-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/putervision/agent-reasoning-mcp/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)

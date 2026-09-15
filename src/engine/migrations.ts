@@ -42,6 +42,7 @@ export function runMigrations(db: Database.Database): void {
       CREATE INDEX IF NOT EXISTS idx_goals_status ON goals(project, status);
       CREATE INDEX IF NOT EXISTS idx_goals_parent ON goals(parent_id);
       CREATE INDEX IF NOT EXISTS idx_goals_client_req ON goals(project, client_request_id);
+      CREATE INDEX IF NOT EXISTS idx_goals_proj_status_priority ON goals(project, status, priority DESC);
 
       CREATE TABLE IF NOT EXISTS beliefs (
         id TEXT PRIMARY KEY,
@@ -125,6 +126,7 @@ export function runMigrations(db: Database.Database): void {
       CREATE INDEX IF NOT EXISTS idx_intentions_status ON intentions(project, status);
       CREATE INDEX IF NOT EXISTS idx_intentions_goal ON intentions(goal_id);
       CREATE INDEX IF NOT EXISTS idx_intentions_client_req ON intentions(project, client_request_id);
+      CREATE INDEX IF NOT EXISTS idx_intentions_proj_status_priority ON intentions(project, status, priority DESC);
 
       CREATE TABLE IF NOT EXISTS knowledge_patterns (
         id TEXT PRIMARY KEY,

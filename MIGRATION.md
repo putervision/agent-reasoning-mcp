@@ -1,6 +1,6 @@
 # 🚀 Migration Guide: @putervision/agent-reasoning-mcp
 
-This guide explains how to migrate client integrations, custom agents, and tool callers to the unified **v0.2.0+ API** with native transport, bounded lookahead evaluation, and canonical resources.
+This guide explains how to migrate client integrations, custom agents, and tool callers to the unified **v0.2.1+ API** with native transport, bounded lookahead evaluation, and canonical resources.
 
 ---
 
