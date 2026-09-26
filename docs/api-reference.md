@@ -1,6 +1,6 @@
 # API Reference: `@putervision/agent-reasoning-mcp` (v0.3.0 — 15 Tools)
 
-Comprehensive documentation for all 15 MCP tools (10 BDI Strategic Deliberation Tools + 5 Jev-Style System 1 Fast Decision Tools) provided by `@putervision/agent-reasoning-mcp`.
+Comprehensive documentation for all 15 MCP tools (10 BDI Strategic Deliberation Tools + 5 System 1 Fast Decision Tools inspired by TypeSafe's Jev pattern) provided by `@putervision/agent-reasoning-mcp`.
 
 ---
 
@@ -152,7 +152,7 @@ Reasoning database statistics, SHA-256 Merkle audit verification, and snapshot r
 
 ---
 
-# Jev-Style "System 1" Fast Decision Layer (Tools 11–15)
+# System 1 Fast Decision Layer (Tools 11–15)
 
 High-frequency sub-millisecond decision layer operating over multi-modal `StatePack` representations with L1 in-memory LRU and L2 persistent SQLite caching.
 

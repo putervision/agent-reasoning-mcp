@@ -46,7 +46,9 @@ npx @putervision/agent-reasoning-mcp inspect
 | `manage_intentions` | `create`, `dispatch`, `get`, `list`, `cancel`, `resolve` | Wire contract directives queue for runtime execution engines |
 | `manage_reasoning_db` | `stats`, `audit`, `snapshot`, `restore` | Reasoning database statistics, SHA-256 Merkle audit, and snapshot rollback |
 
-### Jev-Style "System 1" Fast Decision Layer (5 Tools)
+### System 1 Fast Decision Layer (5 Tools)
+
+> Inspired by the typed System 1 pattern pioneered by TypeSafe's **Jev** (evaluating typed `Choice`, `Score`, and `Noul` primitives over compact state without token generation), implemented locally via in-memory LRU caches and deterministic heuristics (<2ms) without external API calls.
 
 | Tool | Purpose | Latency Target | L1 Cache (p50) | Throughput |
 |------|---------|:---:|:---:|:---:|

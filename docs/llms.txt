@@ -26,7 +26,7 @@
 9. `manage_intentions`: Queue, dispatch, track, and resolve behavior directives for runtime.
 10. `manage_reasoning_db`: Snapshots, diagnostics, and SHA-256 Merkle audit verification.
 
-### Jev-Style "System 1" Fast Decision Layer (Tools 11–15, <2ms Latency SLA)
+### System 1 Fast Decision Layer (Tools 11–15, <2ms Latency SLA)
 11. `classify`: Semantic categorical labeling over multi-modal StatePacks (p50: 7.5 µs, ~90,000 ops/s).
 12. `ask_noul`: Probabilistic Boolean hypothesis verification (p50: 4.9 µs, ~127,000 ops/s).
 13. `ask_choice`: Discrete 1-of-N choice selection with probability simplex (p50: 13.8 µs, ~64,000 ops/s).

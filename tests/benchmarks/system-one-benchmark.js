@@ -8,7 +8,7 @@ import {
 } from '../../dist/lib.js';
 
 console.log('================================================================');
-console.log('   PuterVision Jev-Style "System 1" Fast Decision Benchmark    ');
+console.log('   PuterVision "System 1" Fast Decision Benchmark              ');
 console.log('================================================================\n');
 
 const db = new Database(':memory:');

@@ -1,6 +1,6 @@
 # Performance Benchmarks: `@putervision/agent-reasoning-mcp`
 
-Performance metrics and throughput data for the **Jev-Style "System 1" Fast Decision Layer** (`classify`, `ask_noul`, `ask_choice`, `ask_score`, `gate_intention`) measured on Node.js v22 (x86_64 Linux).
+Performance metrics and throughput data for the **System 1 Fast Decision Layer** (`classify`, `ask_noul`, `ask_choice`, `ask_score`, `gate_intention`) measured on Node.js v22 (x86_64 Linux). Inspired by the typed System 1 pattern pioneered by TypeSafe's Jev.
 
 ---
 
@@ -24,9 +24,9 @@ Measured over 1,000 iterations per tool using multi-modal canonical `StatePack` 
 | :--- | :--- | :--- | :--- | :--- |
 | **External LLM Call** | Remote API / Vision Deliberation | 500 ms – 2,000 ms | ~0.5 – 2 ops/s | Baseline ($1\times$) |
 | **Full BDI DB Query** | Multi-table SQLite join & graph walk | 5 ms – 25 ms | ~40 – 200 ops/s | ~$100\times$ faster |
-| **Jev Cold Heuristic** | Deterministic expected utility & simplex | 0.04 ms – 0.15 ms | 6,500 – 25,000 ops/s | **>10,000x faster** |
-| **Jev L2 Persistent** | Disk-backed SQLite `decision_cache` table | 0.05 ms – 0.12 ms | 8,000 – 20,000 ops/s | **>15,000x faster** |
-| **Jev L1 Memory LRU** | In-memory key-value lookup by `pack_hash` | 0.004 ms – 0.015 ms | 60,000 – 130,000 ops/s | **>50,000x faster** |
+| **System 1 Cold Heuristic** | Deterministic expected utility & simplex | 0.04 ms – 0.15 ms | 6,500 – 25,000 ops/s | **>10,000x faster** |
+| **System 1 L2 Persistent** | Disk-backed SQLite `decision_cache` table | 0.05 ms – 0.12 ms | 8,000 – 20,000 ops/s | **>15,000x faster** |
+| **System 1 L1 Memory LRU** | In-memory key-value lookup by `pack_hash` | 0.004 ms – 0.015 ms | 60,000 – 130,000 ops/s | **>50,000x faster** |
 
 ---
 
