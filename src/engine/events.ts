@@ -33,7 +33,7 @@ export function logReasoningEvent(
   params: {
     project: string;
     entity_id: string;
-    entity_type: 'goal' | 'belief' | 'trace' | 'profile' | 'intention' | 'knowledge';
+    entity_type: ReasoningEvent['entity_type'];
     action: string;
     details?: Record<string, unknown>;
   }

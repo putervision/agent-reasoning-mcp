@@ -3,8 +3,8 @@ import { server } from '../../src/server.js';
 import { toolDefinitions } from '../../src/tools/definitions.js';
 
 describe('MCP Server Registration', () => {
-  it('registers all 10 MCP tools', () => {
-    expect(toolDefinitions).toHaveLength(10);
+  it('registers all 15 MCP tools', () => {
+    expect(toolDefinitions).toHaveLength(15);
     const names = toolDefinitions.map((t) => t.name);
     expect(names).toContain('set_goal');
     expect(names).toContain('evaluate_situation');
@@ -16,5 +16,10 @@ describe('MCP Server Registration', () => {
     expect(names).toContain('manage_beliefs');
     expect(names).toContain('manage_intentions');
     expect(names).toContain('manage_reasoning_db');
+    expect(names).toContain('classify');
+    expect(names).toContain('ask_noul');
+    expect(names).toContain('ask_choice');
+    expect(names).toContain('ask_score');
+    expect(names).toContain('gate_intention');
   });
 });

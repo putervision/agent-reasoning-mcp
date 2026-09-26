@@ -175,4 +175,26 @@ export function runMigrations(db: Database.Database): void {
       ON CONFLICT(key) DO UPDATE SET value = '1';
     `);
   }
+
+  if (currentVersion < 2) {
+    logger.info('Applying migration v2 for agent-reasoning-mcp (decision_cache)...');
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS decision_cache (
+        cache_key TEXT PRIMARY KEY,
+        tool TEXT NOT NULL,
+        query_hash TEXT NOT NULL,
+        pack_hash TEXT NOT NULL,
+        result_json TEXT NOT NULL,
+        tier TEXT NOT NULL CHECK(tier IN ('L1', 'L2', 'L3', 'L4', 'cache')),
+        latency_ms INTEGER,
+        created_at TEXT NOT NULL,
+        expires_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_dcache_pack ON decision_cache(pack_hash);
+      CREATE INDEX IF NOT EXISTS idx_dcache_expires ON decision_cache(expires_at);
+
+      INSERT INTO schema_meta (key, value) VALUES ('version', '2')
+      ON CONFLICT(key) DO UPDATE SET value = '2';
+    `);
+  }
 }

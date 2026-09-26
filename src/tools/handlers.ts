@@ -13,6 +13,8 @@ import { KnowledgeEngine } from '../engine/knowledge.js';
 import { SnapshotEngine } from '../engine/snapshots.js';
 import { verifyEventChain } from '../engine/events.js';
 import { SchemaAdvisor } from '../engine/advisor.js';
+import { DecisionEngine } from '../engine/decision-engine.js';
+import { IntentionGateEngine } from '../engine/intention-gate.js';
 import { ValidationError } from '../utils/errors.js';
 import { z, Schema, ObjectSchema } from '../schema/schemas.js';
 
@@ -363,6 +365,61 @@ export function registerAllTools(server: any): void {
                 `Unsupported manage_reasoning_db action: "${action}". Supported actions: stats, audit, doctor, snapshot, restore, diff.`
               );
             }
+            break;
+          }
+
+          case 'classify': {
+            result = DecisionEngine.classify(db, {
+              project,
+              target_type: args.target_type,
+              target_id: args.target_id,
+              classes: args.classes,
+              state_pack: args.state_pack,
+            });
+            break;
+          }
+
+          case 'ask_noul': {
+            result = DecisionEngine.askNoul(db, {
+              project,
+              statement: args.statement,
+              prior: args.prior,
+              state_pack: args.state_pack,
+            });
+            break;
+          }
+
+          case 'ask_choice': {
+            result = DecisionEngine.askChoice(db, {
+              project,
+              question: args.question,
+              options: args.options,
+              state_pack: args.state_pack,
+              utility_profile: args.utility_profile,
+            });
+            break;
+          }
+
+          case 'ask_score': {
+            result = DecisionEngine.askScore(db, {
+              project,
+              target: args.target,
+              metric: args.metric,
+              scale: args.scale,
+              criteria: args.criteria,
+              state_pack: args.state_pack,
+            });
+            break;
+          }
+
+          case 'gate_intention': {
+            result = IntentionGateEngine.evaluateAndGate(db, {
+              project,
+              intention_id: args.intention_id,
+              proposed_action: args.proposed_action,
+              context_goal_id: args.context_goal_id,
+              state_pack: args.state_pack,
+            });
             break;
           }
 

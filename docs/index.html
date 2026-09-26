@@ -68,6 +68,7 @@
       <ul class="nav-links">
         <li><a href="#simulator">Simulator</a></li>
         <li><a href="#tools">Tools</a></li>
+        <li><a href="#benchmarks">Benchmarks</a></li>
         <li><a href="#architecture">Architecture</a></li>
         <li><a href="#quickstart">Quickstart</a></li>
       </ul>
@@ -93,7 +94,7 @@
     <!-- Hero -->
     <section style="text-align: center; margin-bottom: 4rem;">
       <div style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent-cyan); font-size: 0.85rem; margin-bottom: 1rem;">
-        Model Context Protocol Server • v0.2.1      </div>
+        Model Context Protocol Server • v0.3.0      </div>
       <h1 class="hero-title" style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; background: linear-gradient(135deg, #fff 0%, #9ca3af 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
         Strategic BDI Reasoning & Decision Intelligence
       </h1>
@@ -151,13 +152,15 @@
       </div>
     </section>
 
-    <!-- 10 Tools Explorer -->
+    <!-- 15 Tools Explorer -->
     <section id="tools" style="margin-bottom: 4rem;">
-      <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🛠️ Consolidated MCP Tools (10 Tools)</h2>
+      <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🛠️ Consolidated MCP Tools (15 Tools)</h2>
       <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-        Comprehensive BDI cognitive capabilities exposed cleanly through the standard Model Context Protocol.
+        Complete cognitive toolkit: 10 strategic BDI deliberation tools paired with 5 ultra-low-latency Jev-Style System 1 decision primitives.
       </p>
-      <div class="tools-grid">
+
+      <h3 style="font-size: 1.25rem; color: var(--accent-cyan); margin-bottom: 1rem;">🏛️ BDI Strategic Deliberation (Tools 1–10)</h3>
+      <div class="tools-grid" style="margin-bottom: 2.5rem;">
         <div class="tool-card">
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">set_goal</code>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Manage hierarchical objectives, decompose into sub-goals, and propagate progress across DAGs.</p>
@@ -198,6 +201,128 @@
           <code style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">manage_reasoning_db</code>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Database maintenance, diagnostics, point-in-time snapshots, and SHA-256 Merkle audit verification.</p>
         </div>
+      </div>
+
+      <h3 style="font-size: 1.25rem; color: #10b981; margin-bottom: 1rem;">⚡ Jev-Style "System 1" Fast Decision Layer (Tools 11–15, &lt;2ms SLA)</h3>
+      <div class="tools-grid">
+        <div class="tool-card" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <code style="color: #10b981; font-weight: 700; font-size: 1.1rem;">classify</code>
+            <span style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981;">&lt; 2ms SLA</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Deterministic categorical semantic labeling over StatePacks. <strong>p50: 7.5 µs (~90,000 ops/s)</strong>.</p>
+        </div>
+        <div class="tool-card" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <code style="color: #10b981; font-weight: 700; font-size: 1.1rem;">ask_noul</code>
+            <span style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981;">&lt; 2ms SLA</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Typed probabilistic Boolean verification (p ∈ [0, 1]). <strong>p50: 4.9 µs (~127,000 ops/s)</strong>.</p>
+        </div>
+        <div class="tool-card" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <code style="color: #10b981; font-weight: 700; font-size: 1.1rem;">ask_choice</code>
+            <span style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981;">&lt; 2ms SLA</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Discrete 1-of-N choice selection with probability simplex (N ≤ 16). <strong>p50: 13.8 µs (~64,000 ops/s)</strong>.</p>
+        </div>
+        <div class="tool-card" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <code style="color: #10b981; font-weight: 700; font-size: 1.1rem;">ask_score</code>
+            <span style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981;">&lt; 2ms SLA</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Bounded numeric continuous utility scoring. <strong>p50: 5.7 µs (~129,000 ops/s)</strong>.</p>
+        </div>
+        <div class="tool-card" style="border-color: rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <code style="color: #10b981; font-weight: 700; font-size: 1.1rem;">gate_intention</code>
+            <span style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981;">&lt; 1ms SLA</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Blast-radius audit gate issuing signed HMAC dispatch tokens. <strong>p50: 70.9 µs (~12,000 ops/s)</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benchmarks Section -->
+    <section id="benchmarks" style="margin-bottom: 4rem;">
+      <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        🚀 Performance & Throughput Benchmarks
+      </h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Empirical decision latency metrics measured across 1,000 iterations on Node.js v22 (x86_64 Linux).
+      </p>
+
+      <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-color); color: var(--accent-cyan);">
+              <th style="padding: 0.75rem 1rem;">System 1 Tool</th>
+              <th style="padding: 0.75rem 1rem;">Spec SLA</th>
+              <th style="padding: 0.75rem 1rem;">Cold Eval (Mean)</th>
+              <th style="padding: 0.75rem 1rem;">L1 Cache (p50)</th>
+              <th style="padding: 0.75rem 1rem;">L1 Cache (p95)</th>
+              <th style="padding: 0.75rem 1rem;">Throughput</th>
+              <th style="padding: 0.75rem 1rem;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 0.75rem 1rem;"><code>ask_noul</code></td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">&lt; 2.0 ms</td>
+              <td style="padding: 0.75rem 1rem;">0.0436 ms</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981; font-weight: 700;">0.0049 ms (4.9 µs)</td>
+              <td style="padding: 0.75rem 1rem;">0.0114 ms</td>
+              <td style="padding: 0.75rem 1rem; font-weight: 700;">127,272 ops/s</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981;">✅ PASSED</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 0.75rem 1rem;"><code>classify</code></td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">&lt; 2.0 ms</td>
+              <td style="padding: 0.75rem 1rem;">0.0586 ms</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981; font-weight: 700;">0.0075 ms (7.5 µs)</td>
+              <td style="padding: 0.75rem 1rem;">0.0165 ms</td>
+              <td style="padding: 0.75rem 1rem; font-weight: 700;">90,333 ops/s</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981;">✅ PASSED</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 0.75rem 1rem;"><code>ask_choice</code></td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">&lt; 2.0 ms</td>
+              <td style="padding: 0.75rem 1rem;">0.0627 ms</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981; font-weight: 700;">0.0138 ms (13.8 µs)</td>
+              <td style="padding: 0.75rem 1rem;">0.0314 ms</td>
+              <td style="padding: 0.75rem 1rem; font-weight: 700;">63,829 ops/s</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981;">✅ PASSED</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <td style="padding: 0.75rem 1rem;"><code>ask_score</code></td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">&lt; 2.0 ms</td>
+              <td style="padding: 0.75rem 1rem;">0.0393 ms</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981; font-weight: 700;">0.0057 ms (5.7 µs)</td>
+              <td style="padding: 0.75rem 1rem;">0.0099 ms</td>
+              <td style="padding: 0.75rem 1rem; font-weight: 700;">129,296 ops/s</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981;">✅ PASSED</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.75rem 1rem;"><code>gate_intention</code></td>
+              <td style="padding: 0.75rem 1rem; color: var(--text-secondary);">&lt; 1.0 ms</td>
+              <td style="padding: 0.75rem 1rem;">0.1106 ms</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981; font-weight: 700;">0.0709 ms (70.9 µs)</td>
+              <td style="padding: 0.75rem 1rem;">0.1185 ms</td>
+              <td style="padding: 0.75rem 1rem; font-weight: 700;">12,392 ops/s</td>
+              <td style="padding: 0.75rem 1rem; color: #10b981;">✅ PASSED</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <div class="code-container" style="display: inline-flex; width: auto; max-width: 100%; justify-content: center; gap: 1rem;">
+          <span class="code-text">npm run benchmark</span>
+          <button class="btn-copy" onclick="copyToClipboard('npm run benchmark', this)">Copy</button>
+        </div>
+        <a href="https://github.com/putervision/agent-reasoning-mcp/blob/main/docs/benchmarks.md" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; color: var(--accent-cyan); text-decoration: none; font-size: 0.95rem; font-weight: 600;">
+          Read Detailed Benchmark Report →
+        </a>
       </div>
     </section>
 

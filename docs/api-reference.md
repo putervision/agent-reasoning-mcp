@@ -1,6 +1,6 @@
-# API Reference: `@putervision/agent-reasoning-mcp`
+# API Reference: `@putervision/agent-reasoning-mcp` (v0.3.0 — 15 Tools)
 
-Comprehensive documentation for all 10 MCP tools provided by `@putervision/agent-reasoning-mcp`.
+Comprehensive documentation for all 15 MCP tools (10 BDI Strategic Deliberation Tools + 5 Jev-Style System 1 Fast Decision Tools) provided by `@putervision/agent-reasoning-mcp`.
 
 ---
 
@@ -149,3 +149,90 @@ Reasoning database statistics, SHA-256 Merkle audit verification, and snapshot r
 | `name` | `string` | No | Snapshot name |
 | `description` | `string` | No | Snapshot description |
 | `project` | `string` | No | Target project slug |
+
+---
+
+# Jev-Style "System 1" Fast Decision Layer (Tools 11–15)
+
+High-frequency sub-millisecond decision layer operating over multi-modal `StatePack` representations with L1 in-memory LRU and L2 persistent SQLite caching.
+
+---
+
+## 11. `classify`
+Assigns semantic categorical labels to an entity, visual state, task, or state snapshot using deterministic System One calculus.
+
+* **Target Latency**: `< 2.0 ms` (L1 cache p50: `0.0075 ms`, ~90,000 ops/s)
+
+### Parameters
+| Name | Type | Required | Description |
+|------|------|:---:|-------------|
+| `project` | `string` | Yes | Target project slug |
+| `target_type` | `enum` ("entity", "visual_state", "task", "goal", "snapshot") | Yes | Type of target to classify |
+| `classes` | `array<string>` | Yes | Candidate classes (strictly capped at 16) |
+| `target_id` | `string` | No | Identifier of the target entity/state |
+| `state_pack` | `object` | No | Optional multi-modal StatePack override |
+
+---
+
+## 12. `ask_noul`
+Evaluates whether a specific proposition is true given the current state pack with calibrated probability ($p \in [0.0, 1.0]$) and L1 abstain safeguards.
+
+* **Target Latency**: `< 2.0 ms` (L1 cache p50: `0.0049 ms`, ~127,000 ops/s)
+
+### Parameters
+| Name | Type | Required | Description |
+|------|------|:---:|-------------|
+| `project` | `string` | Yes | Target project slug |
+| `statement` | `string` | Yes | Proposition or hypothesis to test |
+| `prior` | `number` | No | Optional Bayesian prior probability [0.0 – 1.0] |
+| `state_pack` | `object` | No | Optional multi-modal StatePack override |
+
+---
+
+## 13. `ask_choice`
+Selects 1 option from a discrete set of alternatives ($N \le 16$) with full probability distribution simplex and utility margin.
+
+* **Target Latency**: `< 2.0 ms` (L1 cache p50: `0.0138 ms`, ~64,000 ops/s)
+
+### Parameters
+| Name | Type | Required | Description |
+|------|------|:---:|-------------|
+| `project` | `string` | Yes | Target project slug |
+| `question` | `string` | Yes | Decision prompt |
+| `options` | `array<object>` | Yes | Mutually exclusive options (`{id, text}`, max 16) |
+| `state_pack` | `object` | No | Optional multi-modal StatePack override |
+| `utility_profile` | `string` | No | Named utility profile override |
+
+---
+
+## 14. `ask_score`
+Evaluates an entity, plan, or action on a bounded continuous scale (calibrated utility rating).
+
+* **Target Latency**: `< 2.0 ms` (L1 cache p50: `0.0057 ms`, ~129,000 ops/s)
+
+### Parameters
+| Name | Type | Required | Description |
+|------|------|:---:|-------------|
+| `project` | `string` | Yes | Target project slug |
+| `target` | `string` | Yes | Subject to evaluate (entity ID, action name, or state) |
+| `metric` | `string` | Yes | Metric name (e.g. "threat_level", "urgency", "efficiency") |
+| `scale` | `array<number>` | No | `[min, max]` range (defaults to `[0.0, 1.0]`) |
+| `criteria` | `array<string>` | No | Evaluation criteria strings (max 8) |
+| `state_pack` | `object` | No | Optional multi-modal StatePack override |
+
+---
+
+## 15. `gate_intention`
+Evaluates an intention before dispatching to `behavior-mcp` and issues a cryptographic HMAC dispatch token if approved.
+
+* **Target Latency**: `< 1.0 ms` (L1 cache p50: `0.0709 ms`, ~12,000 ops/s)
+
+### Parameters
+| Name | Type | Required | Description |
+|------|------|:---:|-------------|
+| `project` | `string` | Yes | Target project slug |
+| `proposed_action` | `object` | Yes | Proposed behavior action (`{behavior_name, parameters, target_resources}`) |
+| `intention_id` | `string` | No | Originating intention instance ID |
+| `context_goal_id` | `string` | No | Active goal being pursued |
+| `state_pack` | `object` | No | Optional multi-modal StatePack override |
+

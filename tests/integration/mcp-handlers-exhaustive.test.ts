@@ -148,6 +148,18 @@ describe('agent-reasoning-mcp Exhaustive MCP Handlers Integration Suite', () => 
       intention_id: intentionId,
     });
 
+    const getIntentionRes = await manageIntentions({
+      action: 'get',
+      intention_id: intentionId,
+    });
+    expect(JSON.parse(getIntentionRes.content[0].text).id).toBe(intentionId);
+
+    const cancelRes = await manageIntentions({
+      action: 'cancel',
+      intention_id: intentionId,
+    });
+    expect(JSON.parse(cancelRes.content[0].text).status).toBe('aborted');
+
     const resolveRes = await manageIntentions({
       action: 'resolve',
       intention_id: intentionId,
@@ -190,5 +202,56 @@ describe('agent-reasoning-mcp Exhaustive MCP Handlers Integration Suite', () => 
     });
     const snapData = JSON.parse(snapRes.content[0].text);
     expect(snapData.snapshot_id).toBeDefined();
+
+    const docRes = await manageDb({ action: 'doctor' });
+    expect(JSON.parse(docRes.content[0].text).status).toBe('healthy');
+
+    const diffRes = await manageDb({ action: 'diff' });
+    expect(JSON.parse(diffRes.content[0].text)).toBeDefined();
+
+    const restoreRes = await manageDb({ action: 'restore', name: 'post_pipeline_snapshot' });
+    expect(JSON.parse(restoreRes.content[0].text).restored_goals).toBeDefined();
+
+    // 11. classify
+    const classify = toolMap.get('classify')!;
+    const classifyRes = await classify({
+      target_type: 'entity',
+      target_id: 'ent_01',
+      classes: ['threat', 'neutral'],
+    });
+    expect(classifyRes.isError).toBeUndefined();
+
+    // 12. ask_noul
+    const askNoul = toolMap.get('ask_noul')!;
+    const noulRes = await askNoul({
+      statement: 'Area is secure',
+    });
+    expect(noulRes.isError).toBeUndefined();
+
+    // 13. ask_choice
+    const askChoice = toolMap.get('ask_choice')!;
+    const choiceRes = await askChoice({
+      question: 'Which path?',
+      options: [
+        { id: 'p1', text: 'North' },
+        { id: 'p2', text: 'South' },
+      ],
+    });
+    expect(choiceRes.isError).toBeUndefined();
+
+    // 14. ask_score
+    const askScore = toolMap.get('ask_score')!;
+    const scoreRes = await askScore({
+      metric: 'threat_level',
+    });
+    expect(scoreRes.isError).toBeUndefined();
+
+    // 15. gate_intention
+    const gateIntention = toolMap.get('gate_intention')!;
+    const gateRes = await gateIntention({
+      intention_id: intentionId,
+      proposed_action: { behavior_name: 'scout_area' },
+    });
+    expect(gateRes.isError).toBeUndefined();
   });
 });

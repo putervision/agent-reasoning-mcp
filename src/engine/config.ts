@@ -62,3 +62,28 @@ export function loadProjectConfig(projectRoot: string): ProjectConfig {
   cachedConfigs.set(projectRoot, { config, timestamp: now });
   return config;
 }
+
+export function getPentadHmacSecret(projectRoot = process.cwd()): string | undefined {
+  if (process.env.PENTAD_HMAC_SECRET) {
+    return process.env.PENTAD_HMAC_SECRET;
+  }
+  const config = loadProjectConfig(projectRoot);
+  return config.pentadHmacSecret || config.hmacSecret;
+}
+
+export function getDispatchTokenTtlMs(projectRoot = process.cwd()): number {
+  if (process.env.DISPATCH_TOKEN_TTL_MS) {
+    const parsed = parseInt(process.env.DISPATCH_TOKEN_TTL_MS, 10);
+    if (!Number.isNaN(parsed) && parsed > 0) return parsed;
+  }
+  const config = loadProjectConfig(projectRoot);
+  return config.dispatchTokenTtlMs || 30000;
+}
+
+export function getTypeSafeApiKey(): string | undefined {
+  return process.env.TYPESAFE_API_KEY;
+}
+
+export function getL3ModelPath(): string | undefined {
+  return process.env.L3_MODEL_PATH;
+}
