@@ -490,11 +490,16 @@ describe('NativeMcpServer Conformance Suite for agent-reasoning-mcp', () => {
       });
       expect(toolsResp?.error).toBeUndefined();
       const tools = (toolsResp?.result as any).tools;
-      expect(tools.length).toBe(10);
+      expect(tools.length).toBe(15);
       const toolNames = tools.map((t: any) => t.name).sort();
       expect(toolNames).toEqual([
+        'ask_choice',
+        'ask_noul',
+        'ask_score',
         'assess_risk',
+        'classify',
         'evaluate_situation',
+        'gate_intention',
         'get_decision_trace',
         'manage_beliefs',
         'manage_intentions',

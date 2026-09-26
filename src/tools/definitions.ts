@@ -357,4 +357,126 @@ export const toolDefinitions: ToolDefinition[] = [
       required: ['action'],
     },
   },
+  {
+    name: 'classify',
+    description:
+      'Assigns semantic categorical labels to an entity, visual state, task, or state snapshot using deterministic System One calculus.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project: { type: 'string', description: 'Target project slug' },
+        target_type: {
+          type: 'string',
+          enum: ['entity', 'visual_state', 'task', 'goal', 'snapshot'],
+          description: 'Type of target to classify',
+        },
+        target_id: { type: 'string', description: 'Identifier of the target' },
+        classes: {
+          type: 'array',
+          items: { type: 'string' },
+          maxItems: 16,
+          description: 'Candidate classes (capped at 16)',
+        },
+        state_pack: { type: 'object', description: 'Optional explicit StatePack' },
+      },
+      required: ['project', 'target_type', 'classes'],
+    },
+  },
+  {
+    name: 'ask_noul',
+    description:
+      'Evaluates whether a specific proposition is true given the current state pack with calibrated probability and L1 abstain safeguards.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project: { type: 'string', description: 'Target project slug' },
+        statement: { type: 'string', description: 'Proposition to test' },
+        prior: { type: 'number', description: 'Optional Bayesian prior [0.0 - 1.0]' },
+        state_pack: { type: 'object', description: 'Optional explicit StatePack' },
+      },
+      required: ['project', 'statement'],
+    },
+  },
+  {
+    name: 'ask_choice',
+    description:
+      'Selects 1 option from a discrete set of alternatives (N <= 16) with probability distribution and utility margin.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project: { type: 'string', description: 'Target project slug' },
+        question: { type: 'string', description: 'Decision prompt' },
+        options: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              text: { type: 'string' },
+            },
+            required: ['id', 'text'],
+          },
+          maxItems: 16,
+          description: 'Mutually exclusive options (strictly capped at 16)',
+        },
+        state_pack: { type: 'object', description: 'Optional explicit StatePack' },
+        utility_profile: { type: 'string', description: 'Named utility profile override' },
+      },
+      required: ['project', 'question', 'options'],
+    },
+  },
+  {
+    name: 'ask_score',
+    description:
+      'Evaluates an entity, plan, or action on a bounded continuous scale.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project: { type: 'string', description: 'Target project slug' },
+        target: { type: 'string', description: 'Subject to evaluate' },
+        metric: { type: 'string', description: 'Metric name' },
+        scale: {
+          type: 'array',
+          items: { type: 'number' },
+          minItems: 2,
+          maxItems: 2,
+          description: '[min, max] range (defaults to [0.0, 1.0])',
+        },
+        criteria: {
+          type: 'array',
+          items: { type: 'string' },
+          maxItems: 8,
+          description: 'Evaluation criteria',
+        },
+        state_pack: { type: 'object', description: 'Optional explicit StatePack' },
+      },
+      required: ['project', 'target', 'metric'],
+    },
+  },
+  {
+    name: 'gate_intention',
+    description:
+      'Evaluates an intention before dispatching to behavior-mcp and issues a cryptographic HMAC dispatch token if approved.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project: { type: 'string', description: 'Target project slug' },
+        intention_id: { type: 'string', description: 'Target intention ID' },
+        proposed_action: {
+          type: 'object',
+          properties: {
+            behavior_name: { type: 'string' },
+            parameters: { type: 'object' },
+            target_resources: { type: 'array', items: { type: 'string' } },
+          },
+          required: ['behavior_name'],
+          description: 'Proposed behavior action to execute',
+        },
+        context_goal_id: { type: 'string', description: 'Active goal being pursued' },
+        state_pack: { type: 'object', description: 'Optional explicit StatePack' },
+      },
+      required: ['project', 'proposed_action'],
+    },
+  },
 ];
+

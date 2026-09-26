@@ -12,7 +12,9 @@
 - **Reactive Replanning**: Auto-aborts invalidated intentions and generates contingency DAGs when blockers arise.
 - **Cryptographic Audit Ledger**: Unbroken SHA-256 Merkle hash chain tracking all cognitive events.
 
-## 10 Consolidated MCP Tools
+## 15 Consolidated MCP Tools
+
+### BDI Strategic Deliberation (Tools 1–10)
 1. `set_goal`: Register, update, decompose, get, list, or abandon hierarchical goals.
 2. `evaluate_situation`: Process multi-modal situation snapshot and output ranked recommendations.
 3. `replan`: Adaptively reconstruct subgoals upon blockers or unexpected events.
@@ -23,5 +25,12 @@
 8. `manage_beliefs`: Structured belief state with exponential confidence decay.
 9. `manage_intentions`: Queue, dispatch, track, and resolve behavior directives for runtime.
 10. `manage_reasoning_db`: Snapshots, diagnostics, and SHA-256 Merkle audit verification.
+
+### Jev-Style "System 1" Fast Decision Layer (Tools 11–15, <2ms Latency SLA)
+11. `classify`: Semantic categorical labeling over multi-modal StatePacks (p50: 7.5 µs, ~90,000 ops/s).
+12. `ask_noul`: Probabilistic Boolean hypothesis verification (p50: 4.9 µs, ~127,000 ops/s).
+13. `ask_choice`: Discrete 1-of-N choice selection with probability simplex (p50: 13.8 µs, ~64,000 ops/s).
+14. `ask_score`: Bounded numeric scalar scoring and calibrated utility rating (p50: 5.7 µs, ~129,000 ops/s).
+15. `gate_intention`: Blast-radius audit gate issuing signed HMAC dispatch tokens (p50: 70.9 µs, ~12,000 ops/s).
 
 *Non-claims statement: Functional agency and closed-loop automation — not consciousness, sentience, or AGI.*
