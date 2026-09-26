@@ -72,11 +72,12 @@ export class DecisionLRUCache {
 export const globalDecisionCache = new DecisionLRUCache(1000, 60000);
 
 export class PersistentDecisionCache {
-  static getFromDb<T>(db: Database.Database, cacheKey: string): { result: T; latency_ms: number } | null {
+  static getFromDb<T>(
+    db: Database.Database,
+    cacheKey: string
+  ): { result: T; latency_ms: number } | null {
     const row = db
-      .prepare(
-        'SELECT result_json, expires_at FROM decision_cache WHERE cache_key = ?'
-      )
+      .prepare('SELECT result_json, expires_at FROM decision_cache WHERE cache_key = ?')
       .get(cacheKey) as { result_json: string; expires_at: string } | undefined;
 
     if (!row) return null;

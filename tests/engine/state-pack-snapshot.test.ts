@@ -13,6 +13,7 @@ describe('StatePackBuilder.fromSnapshot Comprehensive Coverage', () => {
 
     const pack = StatePackBuilder.fromSituationSnapshot(
       {
+        session_id: 'sess_snap_001',
         vision: {
           current_state_id: 'vs_scene_42',
           description: longDesc,
@@ -22,10 +23,16 @@ describe('StatePackBuilder.fromSnapshot Comprehensive Coverage', () => {
           observer_position: [0, 0, 0],
           entities,
         },
+
         state: {
           active_goals: [{ id: 'goal_main', title: 'Main Mission', priority: 0.95 }],
           blockers: [{ id: 'blk_door', description: 'Locked blast door' }],
-          recent_decisions: [{ id: 'dec_1' }, { id: 'dec_2' }, { id: 'dec_3' }, { id: 'dec_4' }] as any,
+          recent_decisions: [
+            { id: 'dec_1' },
+            { id: 'dec_2' },
+            { id: 'dec_3' },
+            { id: 'dec_4' },
+          ] as any,
         },
         vitals: {
           hp: 75.5,
@@ -57,10 +64,11 @@ describe('StatePackBuilder.fromSnapshot Comprehensive Coverage', () => {
   it('handles sparse/empty snapshots gracefully with fallbacks', () => {
     const pack = StatePackBuilder.fromSituationSnapshot(
       {
+        session_id: 'sess_sparse_002',
         vision: {
           description: 'short desc',
         },
-        world: {},
+        world: { entities: [] },
         state: {
           decisions: [{ id: 'd_fallback' }] as any,
         },

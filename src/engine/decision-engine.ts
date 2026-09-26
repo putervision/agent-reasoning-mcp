@@ -44,9 +44,11 @@ export class DecisionEngine {
   /**
    * Helper to ensure a StatePack is available or create a default sparse one.
    */
-  private static resolveStatePack(
-    params: { project: string; session_id?: string; state_pack?: StatePack }
-  ): StatePack {
+  private static resolveStatePack(params: {
+    project: string;
+    session_id?: string;
+    state_pack?: StatePack;
+  }): StatePack {
     if (params.state_pack && StatePackBuilder.validate(params.state_pack)) {
       return params.state_pack;
     }
@@ -72,7 +74,10 @@ export class DecisionEngine {
     const startTime = performance.now();
     const pack = this.resolveStatePack(params);
     const targetObj = typeof (params as any).target === 'object' ? (params as any).target : null;
-    const targetId = params.target_id || (typeof (params as any).target === 'string' ? (params as any).target : targetObj?.id) || `${params.target_type}_target`;
+    const targetId =
+      params.target_id ||
+      (typeof (params as any).target === 'string' ? (params as any).target : targetObj?.id) ||
+      `${params.target_type}_target`;
 
     // Cap candidate classes at 16
     const rawClasses = params.classes || (params as any).candidate_classes || [];
@@ -82,18 +87,30 @@ export class DecisionEngine {
     }
 
     // Cache check
-    const queryPayload = { target_type: params.target_type, target_id: targetId, classes: candidateClasses };
+    const queryPayload = {
+      target_type: params.target_type,
+      target_id: targetId,
+      classes: candidateClasses,
+    };
     const cacheKey = DecisionLRUCache.computeCacheKey(pack.pack_hash, 'classify', queryPayload);
 
     const memoryHit = globalDecisionCache.get<ClassifyResponse>(cacheKey);
     if (memoryHit) {
-      const res = { ...memoryHit.result, tier: 'cache' as const, latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      const res = {
+        ...memoryHit.result,
+        tier: 'cache' as const,
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
       return res;
     }
 
     const dbHit = PersistentDecisionCache.getFromDb<ClassifyResponse>(db, cacheKey);
     if (dbHit) {
-      const res = { ...dbHit.result, tier: 'cache' as const, latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      const res = {
+        ...dbHit.result,
+        tier: 'cache' as const,
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
       globalDecisionCache.set(cacheKey, res);
       return res;
     }
@@ -113,9 +130,12 @@ export class DecisionEngine {
     if (targetObj) {
       hasFeatures = true;
       for (const c of candidateClasses) {
-        if (targetObj.type && targetObj.type.toLowerCase().includes(c.toLowerCase())) classScores[c] += 0.8;
-        if (targetObj.status && targetObj.status.toLowerCase().includes(c.toLowerCase())) classScores[c] += 0.8;
-        if (/hostile/i.test(targetObj.status) && /threat|critical|danger/i.test(c)) classScores[c] += 0.85;
+        if (targetObj.type && targetObj.type.toLowerCase().includes(c.toLowerCase()))
+          classScores[c] += 0.8;
+        if (targetObj.status && targetObj.status.toLowerCase().includes(c.toLowerCase()))
+          classScores[c] += 0.8;
+        if (/hostile/i.test(targetObj.status) && /threat|critical|danger/i.test(c))
+          classScores[c] += 0.85;
       }
     }
 
@@ -144,10 +164,15 @@ export class DecisionEngine {
     // Feature matching: Spatial Entities
     if (pack.spatial && pack.spatial.nearby_entities.length > 0) {
       hasFeatures = true;
-      const matchingEntity = pack.spatial.nearby_entities.find((e) => e.id === targetId || candidateClasses.includes(e.type));
+      const matchingEntity = pack.spatial.nearby_entities.find(
+        (e) => e.id === targetId || candidateClasses.includes(e.type)
+      );
       if (matchingEntity) {
         for (const c of candidateClasses) {
-          if (c.toLowerCase() === matchingEntity.type.toLowerCase() || c.toLowerCase() === matchingEntity.status.toLowerCase()) {
+          if (
+            c.toLowerCase() === matchingEntity.type.toLowerCase() ||
+            c.toLowerCase() === matchingEntity.status.toLowerCase()
+          ) {
             classScores[c] += 0.8;
             reasons.push('SPATIAL_PROXIMITY_MATCH');
           }
@@ -170,7 +195,9 @@ export class DecisionEngine {
     // Feature matching: Tasks / Blockers
     if (pack.tasks) {
       hasFeatures = true;
-      const blockerText = pack.tasks.active_blockers.map((b) => b.description.toLowerCase()).join(' ');
+      const blockerText = pack.tasks.active_blockers
+        .map((b) => b.description.toLowerCase())
+        .join(' ');
       for (const c of candidateClasses) {
         if (blockerText.includes(c.toLowerCase())) {
           classScores[c] += 0.6;
@@ -332,12 +359,20 @@ export class DecisionEngine {
 
     const memoryHit = globalDecisionCache.get<AskNoulResponse>(cacheKey);
     if (memoryHit) {
-      return { ...memoryHit.result, tier: 'cache', latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      return {
+        ...memoryHit.result,
+        tier: 'cache',
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
     }
 
     const dbHit = PersistentDecisionCache.getFromDb<AskNoulResponse>(db, cacheKey);
     if (dbHit) {
-      const res = { ...dbHit.result, tier: 'cache' as const, latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      const res = {
+        ...dbHit.result,
+        tier: 'cache' as const,
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
       globalDecisionCache.set(cacheKey, res);
       return res;
     }
@@ -490,17 +525,29 @@ export class DecisionEngine {
       throw new Error('ask_choice requires at least 1 option.');
     }
 
-    const queryPayload = { question: params.question, options: candidateOptions, utility_profile: params.utility_profile };
+    const queryPayload = {
+      question: params.question,
+      options: candidateOptions,
+      utility_profile: params.utility_profile,
+    };
     const cacheKey = DecisionLRUCache.computeCacheKey(pack.pack_hash, 'ask_choice', queryPayload);
 
     const memoryHit = globalDecisionCache.get<AskChoiceResponse>(cacheKey);
     if (memoryHit) {
-      return { ...memoryHit.result, tier: 'cache', latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      return {
+        ...memoryHit.result,
+        tier: 'cache',
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
     }
 
     const dbHit = PersistentDecisionCache.getFromDb<AskChoiceResponse>(db, cacheKey);
     if (dbHit) {
-      const res = { ...dbHit.result, tier: 'cache' as const, latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      const res = {
+        ...dbHit.result,
+        tier: 'cache' as const,
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
       globalDecisionCache.set(cacheKey, res);
       return res;
     }
@@ -677,22 +724,38 @@ export class DecisionEngine {
     if (Array.isArray(params.scale) && params.scale.length === 2) {
       minScale = params.scale[0];
       maxScale = params.scale[1];
-    } else if (typeof (params as any).min_value === 'number' && typeof (params as any).max_value === 'number') {
+    } else if (
+      typeof (params as any).min_value === 'number' &&
+      typeof (params as any).max_value === 'number'
+    ) {
       minScale = (params as any).min_value;
       maxScale = (params as any).max_value;
     }
     const targetEntityId = params.target || params.metric || 'score_target';
-    const queryPayload = { target: targetEntityId, metric: params.metric, scale: [minScale, maxScale], criteria: params.criteria };
+    const queryPayload = {
+      target: targetEntityId,
+      metric: params.metric,
+      scale: [minScale, maxScale],
+      criteria: params.criteria,
+    };
     const cacheKey = DecisionLRUCache.computeCacheKey(pack.pack_hash, 'ask_score', queryPayload);
 
     const memoryHit = globalDecisionCache.get<AskScoreResponse>(cacheKey);
     if (memoryHit) {
-      return { ...memoryHit.result, tier: 'cache', latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      return {
+        ...memoryHit.result,
+        tier: 'cache',
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
     }
 
     const dbHit = PersistentDecisionCache.getFromDb<AskScoreResponse>(db, cacheKey);
     if (dbHit) {
-      const res = { ...dbHit.result, tier: 'cache' as const, latency_ms: Math.round((performance.now() - startTime) * 100) / 100 };
+      const res = {
+        ...dbHit.result,
+        tier: 'cache' as const,
+        latency_ms: Math.round((performance.now() - startTime) * 100) / 100,
+      };
       globalDecisionCache.set(cacheKey, res);
       return res;
     }
@@ -707,7 +770,7 @@ export class DecisionEngine {
 
     if (/threat|risk|danger/i.test(metric)) {
       hasSignal = true;
-      normalized = (pack.vitals?.threat_level ?? 0.3);
+      normalized = pack.vitals?.threat_level ?? 0.3;
       confidence = 0.85;
       reasons.push('HIGH_THREAT_DETECTED');
     } else if (/health|vitality|hp/i.test(metric)) {

@@ -232,7 +232,10 @@ describe('agent-reasoning-mcp Exhaustive MCP Handlers Integration Suite', () => 
     const askChoice = toolMap.get('ask_choice')!;
     const choiceRes = await askChoice({
       question: 'Which path?',
-      options: [{ id: 'p1', text: 'North' }, { id: 'p2', text: 'South' }],
+      options: [
+        { id: 'p1', text: 'North' },
+        { id: 'p2', text: 'South' },
+      ],
     });
     expect(choiceRes.isError).toBeUndefined();
 

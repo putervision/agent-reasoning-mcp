@@ -87,4 +87,3 @@ export function getTypeSafeApiKey(): string | undefined {
 export function getL3ModelPath(): string | undefined {
   return process.env.L3_MODEL_PATH;
 }
-

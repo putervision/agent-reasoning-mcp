@@ -54,7 +54,10 @@ describe('Config & Tool Error Handling Coverage', () => {
     const dbRes = await dbHandler({ project: 'test_p', action: 'unsupported_db_action' });
     expect(dbRes.isError).toBe(true);
 
-    const intentRes = await intentHandler({ project: 'test_p', action: 'unsupported_intent_action' });
+    const intentRes = await intentHandler({
+      project: 'test_p',
+      action: 'unsupported_intent_action',
+    });
     expect(intentRes.isError).toBe(true);
   });
 
@@ -101,38 +104,33 @@ describe('Config & Tool Error Handling Coverage', () => {
     runMigrations(testDb);
 
     // Goal not found
-    const resNotFound = IntentionGateEngine.evaluateAndGate(
-      testDb,
-      {
-        project: 'test_p',
-        proposed_action: { behavior_name: 'test_act' },
-        context_goal_id: 'nonexistent_goal',
-      }
-    );
+    const resNotFound = IntentionGateEngine.evaluateAndGate(testDb, {
+      project: 'test_p',
+      proposed_action: { behavior_name: 'test_act' },
+      context_goal_id: 'nonexistent_goal',
+    });
     expect(resNotFound.in_scope).toBe(false);
 
     // Goal completed
-    testDb.prepare("INSERT INTO goals (id, project, title, status, created_at, updated_at) VALUES ('g1', 'test_p', 'Goal 1', 'completed', 'now', 'now')").run();
-    const resCompleted = IntentionGateEngine.evaluateAndGate(
-      testDb,
-      {
-        project: 'test_p',
-        proposed_action: { behavior_name: 'test_act' },
-        context_goal_id: 'g1',
-      }
-    );
+    testDb
+      .prepare(
+        "INSERT INTO goals (id, project, title, status, created_at, updated_at) VALUES ('g1', 'test_p', 'Goal 1', 'completed', 'now', 'now')"
+      )
+      .run();
+    const resCompleted = IntentionGateEngine.evaluateAndGate(testDb, {
+      project: 'test_p',
+      proposed_action: { behavior_name: 'test_act' },
+      context_goal_id: 'g1',
+    });
     expect(resCompleted.in_scope).toBe(false);
 
     // Goal active
     testDb.prepare("UPDATE goals SET status = 'active' WHERE id = 'g1'").run();
-    const resActive = IntentionGateEngine.evaluateAndGate(
-      testDb,
-      {
-        project: 'test_p',
-        proposed_action: { behavior_name: 'test_act' },
-        context_goal_id: 'g1',
-      }
-    );
+    const resActive = IntentionGateEngine.evaluateAndGate(testDb, {
+      project: 'test_p',
+      proposed_action: { behavior_name: 'test_act' },
+      context_goal_id: 'g1',
+    });
     expect(resActive.in_scope).toBe(true);
 
     // High risk score & critical health attack
@@ -140,16 +138,14 @@ describe('Config & Tool Error Handling Coverage', () => {
     const pack = StatePackBuilder.build({
       project: 'test_p',
       session_id: 's',
-      vitals: { hp: 10, max_hp: 100 },
+      vitals: { hp: 10, threat_level: 0.9 },
     });
-    const resCritical = IntentionGateEngine.evaluateAndGate(
-      testDb,
-      {
-        project: 'test_p',
-        proposed_action: { behavior_name: 'attack_enemy' },
-        state_pack: pack,
-      }
-    );
+
+    const resCritical = IntentionGateEngine.evaluateAndGate(testDb, {
+      project: 'test_p',
+      proposed_action: { behavior_name: 'attack_enemy' },
+      state_pack: pack,
+    });
     expect(resCritical.allowed).toBe(false);
 
     // Cover ProjectConfigSchema and safeJsonStringify fallback
@@ -163,7 +159,9 @@ describe('Config & Tool Error Handling Coverage', () => {
 
     // Cover path-validator
     const { validatePath } = await import('../../src/utils/path-validator.js');
-    expect(() => validatePath('', { projectRoot: '/tmp' })).toThrow('File path must be a non-empty string');
+    expect(() => validatePath('', { projectRoot: '/tmp' })).toThrow(
+      'File path must be a non-empty string'
+    );
     expect(() => validatePath('/etc/shadow', { projectRoot: '/tmp' })).toThrow('Access denied');
     expect(validatePath('test.json', { projectRoot: '/tmp' })).toBe('/tmp/test.json');
 
@@ -171,4 +169,3 @@ describe('Config & Tool Error Handling Coverage', () => {
     testDb.close();
   });
 });
-

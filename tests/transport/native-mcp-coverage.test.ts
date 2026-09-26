@@ -16,7 +16,7 @@ describe('Native MCP Transport & Client Exhaustive Coverage', () => {
     }));
 
     // Register a prompt
-    server.prompt('system_prompt', { role: { type: 'string' } }, (args: any) => ({
+    server.prompt('system_prompt', 'System prompt', { role: { type: 'string' } }, (args: any) => ({
       messages: [{ role: 'user', content: { type: 'text', text: `Role: ${args.role}` } }],
     }));
 
@@ -48,7 +48,10 @@ describe('Native MCP Transport & Client Exhaustive Coverage', () => {
     const prompts = await client.listPrompts();
     expect(prompts.prompts.some((p: any) => p.name === 'system_prompt')).toBe(true);
 
-    const promptRes = await client.getPrompt({ name: 'system_prompt', arguments: { role: 'tester' } });
+    const promptRes = await client.getPrompt({
+      name: 'system_prompt',
+      arguments: { role: 'tester' },
+    });
     expect(promptRes.messages[0].content.text).toBe('Role: tester');
     expect(server._registeredPrompts['system_prompt']).toBeDefined();
 

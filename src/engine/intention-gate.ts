@@ -51,7 +51,11 @@ export class IntentionGateEngine {
       parameters: actionParams,
       context_goal_id: params.context_goal_id,
     };
-    const cacheKey = DecisionLRUCache.computeCacheKey(pack.pack_hash, 'gate_intention', queryPayload);
+    const cacheKey = DecisionLRUCache.computeCacheKey(
+      pack.pack_hash,
+      'gate_intention',
+      queryPayload
+    );
 
     // Fail-closed if HMAC secret is unset
     if (!secret || secret.trim() === '') {
@@ -75,7 +79,9 @@ export class IntentionGateEngine {
         risk_score: 1.0,
         significance: 1.0,
         in_scope: true,
-        policy_violations: ['PENTAD_HMAC_SECRET environment variable is missing or empty. Token signing refused.'],
+        policy_violations: [
+          'PENTAD_HMAC_SECRET environment variable is missing or empty. Token signing refused.',
+        ],
         reasons: ['MISSING_REQUIRED_PARAMS'],
         tier: 'L1',
         latency_ms,
@@ -109,7 +115,9 @@ export class IntentionGateEngine {
         .get(params.context_goal_id, params.project) as { id: string; status: string } | undefined;
       if (!goalRow) {
         in_scope = false;
-        policy_violations.push(`Goal ${params.context_goal_id} not found in project ${params.project}`);
+        policy_violations.push(
+          `Goal ${params.context_goal_id} not found in project ${params.project}`
+        );
         reasons.push('OUT_OF_SCOPE');
       } else if (goalRow.status === 'completed' || goalRow.status === 'abandoned') {
         in_scope = false;
@@ -121,8 +129,14 @@ export class IntentionGateEngine {
     }
 
     // Check for destructive actions
-    if (/drop_db|purge_database|delete_all|format_drive|terminate_system|destroy_root|delete_system|destroy_system|delete_partition/i.test(behaviorName)) {
-      policy_violations.push(`Destructive behavior ${behaviorName} requires explicit human approval`);
+    if (
+      /drop_db|purge_database|delete_all|format_drive|terminate_system|destroy_root|delete_system|destroy_system|delete_partition/i.test(
+        behaviorName
+      )
+    ) {
+      policy_violations.push(
+        `Destructive behavior ${behaviorName} requires explicit human approval`
+      );
       reasons.push('DESTRUCTIVE_ACTION_DETECTED');
     }
 
@@ -131,7 +145,11 @@ export class IntentionGateEngine {
       reasons.push('RISK_SCORE_EXCEEDED');
     }
 
-    if (pack.vitals && (pack.vitals.hp ?? 100) < 20 && /attack|assault|engage/i.test(behaviorName)) {
+    if (
+      pack.vitals &&
+      (pack.vitals.hp ?? 100) < 20 &&
+      /attack|assault|engage/i.test(behaviorName)
+    ) {
       policy_violations.push('Agent in critical health state; offensive engagement forbidden');
       reasons.push('CRITICAL_VITALS_HP');
     }
@@ -167,7 +185,10 @@ export class IntentionGateEngine {
       const expiresAt = new Date(now + ttlMs).toISOString();
 
       const tokenPreimage = `${tokenId}:${intentionId}:${behaviorName}:${paramsHash}:behavior-mcp:${issuedAt}:${expiresAt}`;
-      const hmacSignature = crypto.createHmac('sha256', secret).update(tokenPreimage, 'utf8').digest('hex');
+      const hmacSignature = crypto
+        .createHmac('sha256', secret)
+        .update(tokenPreimage, 'utf8')
+        .digest('hex');
 
       dispatch_token = {
         token_id: tokenId,

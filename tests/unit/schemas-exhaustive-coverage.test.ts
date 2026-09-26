@@ -166,11 +166,14 @@ describe('Exhaustive Schema Validation Suite', () => {
 
   describe('ObjectSchema & UnknownSchema', () => {
     it('handles objects, required properties, toJsonSchema, and passthrough', () => {
-      const schema = z.object({
-        name: z.string(),
-        age: z.number().optional(),
-        tags: z.array(z.string()).default([]),
-      }).describe('person schema').passthrough();
+      const schema = z
+        .object({
+          name: z.string(),
+          age: z.number().optional(),
+          tags: z.array(z.string()).default([]),
+        })
+        .describe('person schema')
+        .passthrough();
 
       expect(schema.toJsonSchema()).toEqual({
         type: 'object',

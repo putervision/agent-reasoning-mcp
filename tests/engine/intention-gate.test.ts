@@ -56,7 +56,10 @@ describe('IntentionGateEngine - Intention Pre-Dispatch Security Gate', () => {
     // Verify HMAC signature manually
     const secret = process.env.PENTAD_HMAC_SECRET!;
     const expectedPreimage = `${token.token_id}:${token.intention_id}:${token.behavior_name}:${token.params_hash}:${token.aud}:${token.issued_at}:${token.expires_at}`;
-    const expectedSig = crypto.createHmac('sha256', secret).update(expectedPreimage, 'utf8').digest('hex');
+    const expectedSig = crypto
+      .createHmac('sha256', secret)
+      .update(expectedPreimage, 'utf8')
+      .digest('hex');
     expect(token.hmac_signature).toBe(expectedSig);
   });
 
@@ -123,7 +126,9 @@ describe('IntentionGateEngine - Intention Pre-Dispatch Security Gate', () => {
 
     expect(result.allowed).toBe(false);
     expect(result.verdict).toBe('rejected');
-    expect(result.policy_violations).toContain('Agent in critical health state; offensive engagement forbidden');
+    expect(result.policy_violations).toContain(
+      'Agent in critical health state; offensive engagement forbidden'
+    );
     expect(result.reasons).toContain('CRITICAL_VITALS_HP');
   });
 });

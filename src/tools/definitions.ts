@@ -427,8 +427,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'ask_score',
-    description:
-      'Evaluates an entity, plan, or action on a bounded continuous scale.',
+    description: 'Evaluates an entity, plan, or action on a bounded continuous scale.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -479,4 +478,3 @@ export const toolDefinitions: ToolDefinition[] = [
     },
   },
 ];
-

@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Database from 'better-sqlite3';
 import { runMigrations } from '../../src/engine/migrations.js';
-import { DecisionEngine, registerCentroid, clearCentroids } from '../../src/engine/decision-engine.js';
+import {
+  DecisionEngine,
+  registerCentroid,
+  clearCentroids,
+} from '../../src/engine/decision-engine.js';
 import { StatePackBuilder } from '../../src/engine/state-pack.js';
 import { globalDecisionCache } from '../../src/engine/cache.js';
 import { StatePack } from '../../src/schema/types.js';
@@ -37,9 +41,7 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
         priority: 0.95,
         progress: 0.2,
       },
-      active_blockers: [
-        { id: 'blk_01', description: 'Hostile drone patrol in quadrant' },
-      ],
+      active_blockers: [{ id: 'blk_01', description: 'Hostile drone patrol in quadrant' }],
       recent_decision_ids: [],
     },
     vitals: {
@@ -63,8 +65,8 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     const result = DecisionEngine.classify(db, {
       project,
       target_type: 'entity',
-      target: { id: 'ent_drone', type: 'hostile_drone', status: 'hostile' },
-      candidate_classes: ['critical_threat', 'neutral_ambient', 'friendly'],
+      target_id: 'ent_drone',
+      classes: ['critical_threat', 'neutral_ambient', 'friendly'],
       state_pack: baseStatePack,
     });
 
@@ -86,8 +88,8 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     const result = DecisionEngine.classify(db, {
       project,
       target_type: 'entity',
-      target: { id: 'unknown_obj', type: 'unknown' },
-      candidate_classes: ['alpha', 'beta', 'gamma'],
+      target_id: 'unknown_obj',
+      classes: ['alpha', 'beta', 'gamma'],
       state_pack: emptyPack,
     });
 
@@ -98,7 +100,7 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
   it('evaluates ask_noul proposition with confidence and escalation on uncertainty [airgap]', () => {
     const result = DecisionEngine.askNoul(db, {
       project,
-      proposition: 'Threat level is high and agent is in critical condition',
+      statement: 'Threat level is high and agent is in critical condition',
       state_pack: baseStatePack,
     });
 
@@ -129,9 +131,9 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
   it('evaluates ask_score on bounded numeric scale [airgap]', () => {
     const result = DecisionEngine.askScore(db, {
       project,
+      target: 'threat',
       metric: 'threat_severity',
-      min_value: 0,
-      max_value: 100,
+      scale: [0, 100],
       state_pack: baseStatePack,
     });
 
@@ -144,9 +146,9 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     // Health (critical < 30)
     const hpRes = DecisionEngine.askScore(db, {
       project,
+      target: 'agent',
       metric: 'hp',
-      min_value: 0,
-      max_value: 100,
+      scale: [0, 100],
       state_pack: baseStatePack,
     });
     expect(hpRes.reasons).toContain('CRITICAL_VITALS_HP');
@@ -155,6 +157,7 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     // Progress
     const progRes = DecisionEngine.askScore(db, {
       project,
+      target: 'goal',
       metric: 'goal_completion_progress',
       state_pack: baseStatePack,
     });
@@ -164,6 +167,7 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     // Unknown metric
     const unkRes = DecisionEngine.askScore(db, {
       project,
+      target: 'unknown',
       metric: 'unknown_abstract_metric',
       state_pack: baseStatePack,
     });
@@ -174,7 +178,7 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     // First query
     const res1 = DecisionEngine.askNoul(db, {
       project,
-      proposition: 'Is immediate evacuation required?',
+      statement: 'Is immediate evacuation required?',
       state_pack: baseStatePack,
     });
     expect(res1.tier).toBe('L1');
@@ -182,7 +186,7 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     // Second identical query
     const res2 = DecisionEngine.askNoul(db, {
       project,
-      proposition: 'Is immediate evacuation required?',
+      statement: 'Is immediate evacuation required?',
       state_pack: baseStatePack,
     });
     expect(res2.tier).toBe('cache');
@@ -192,11 +196,13 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     // askScore cache hit
     const s1 = DecisionEngine.askScore(db, {
       project,
+      target: 'threat',
       metric: 'threat_level',
       state_pack: baseStatePack,
     });
     const s2 = DecisionEngine.askScore(db, {
       project,
+      target: 'threat',
       metric: 'threat_level',
       state_pack: baseStatePack,
     });
@@ -221,8 +227,8 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
     const result = DecisionEngine.classify(db, {
       project,
       target_type: 'entity',
-      target: { id: 'unknown_ent', type: 'unknown' },
-      candidate_classes: ['boss_unit', 'grunt_unit'],
+      target_id: 'unknown_ent',
+      classes: ['boss_unit', 'grunt_unit'],
       state_pack: l2Pack,
     });
 
@@ -247,7 +253,9 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
 
     // Expired row in PersistentDecisionCache
     const pastDate = new Date(Date.now() - 10000).toISOString();
-    db.prepare('INSERT INTO decision_cache (cache_key, tool, query_hash, pack_hash, result_json, tier, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(
+    db.prepare(
+      'INSERT INTO decision_cache (cache_key, tool, query_hash, pack_hash, result_json, tier, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).run(
       'expired_key',
       'classify',
       'qhash',
@@ -262,7 +270,9 @@ describe('DecisionEngine - L1/L2 Fast Decision Layer', () => {
 
     // Invalid JSON row in PersistentDecisionCache
     const futureDate = new Date(Date.now() + 60000).toISOString();
-    db.prepare('INSERT INTO decision_cache (cache_key, tool, query_hash, pack_hash, result_json, tier, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(
+    db.prepare(
+      'INSERT INTO decision_cache (cache_key, tool, query_hash, pack_hash, result_json, tier, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    ).run(
       'bad_json_key',
       'classify',
       'qhash',
