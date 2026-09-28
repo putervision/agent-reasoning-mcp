@@ -89,7 +89,7 @@ describe('Config & Tool Error Handling Coverage', () => {
     expect(canonicalJsonStringify(Symbol('test'))).toBe(undefined);
 
     const { getVersion } = await import('../../src/utils/version.js');
-    expect(getVersion()).toBe('0.3.0');
+    expect(getVersion()).toBe('0.3.1');
     (globalThis as any).__APP_VERSION__ = '1.2.3';
     expect(getVersion()).toBe('1.2.3');
     delete (globalThis as any).__APP_VERSION__;

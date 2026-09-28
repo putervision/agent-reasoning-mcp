@@ -1,4 +1,4 @@
-# API Reference: `@putervision/agent-reasoning-mcp` (v0.3.0 — 15 Tools)
+# API Reference: `@putervision/agent-reasoning-mcp` (v0.3.1 — 15 Tools)
 
 Comprehensive documentation for all 15 MCP tools (10 BDI Strategic Deliberation Tools + 5 System 1 Fast Decision Tools inspired by TypeSafe's Jev pattern) provided by `@putervision/agent-reasoning-mcp`.
 
