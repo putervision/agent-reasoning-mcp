@@ -4,20 +4,32 @@ export interface ToolDefinition {
   inputSchema: Record<string, unknown>;
 }
 
-export const READ_ONLY_TOOLS = new Set(['query_beliefs', 'get_decision_trace', 'query_knowledge']);
+export const READ_ONLY_TOOLS = new Set([
+  'query_knowledge',
+  'get_decision_trace',
+  'assess_risk',
+  'classify',
+  'ask_noul',
+  'ask_choice',
+  'ask_score',
+  'gate_intention',
+]);
+
+export const DESTRUCTIVE_TOOLS = new Set(['manage_beliefs', 'manage_reasoning_db']);
 
 export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'set_goal',
     description:
-      'Register, update, decompose, or manage hierarchical goals and task DAGs in the reasoning engine.',
+      'Register, update, decompose, inspect, or abandon hierarchical goals and task DAGs (actions: create, update, decompose, get, list, abandon). Use set_goal instead of manage_intentions when formulating multi-step objectives and sub-goal DAGs rather than queueing concrete execution directives.\n\nReturns goal record, sub-goal hierarchy, completion progress, or goal lists.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['create', 'update', 'decompose', 'get', 'list', 'abandon'],
-          description: 'The goal management operation to perform',
+          description:
+            'The goal management operation to perform: create, update, decompose, get, list, abandon',
         },
         id: { type: 'string', description: 'Goal ID (required for update, get, abandon)' },
         parent_id: { type: 'string', description: 'Parent goal ID for hierarchical sub-goals' },
@@ -63,14 +75,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'evaluate_situation',
     description:
-      'Ingest multi-modal situation snapshot, compute expected utilities against active weights, and output prioritized action recommendations.',
+      'Ingest multi-modal situation snapshot, compute expected utilities against active weights, and output prioritized action recommendations (actions: snapshot, quick). Use evaluate_situation instead of assess_risk when ranking candidate actions across multi-attribute utility dimensions rather than calculating isolated threat probabilities.\n\nReturns ranked candidate actions, expected utility scores, and top recommendation.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['snapshot', 'quick'],
-          description: 'Snapshot evaluation mode or quick text context',
+          description: 'Snapshot evaluation mode or quick text context: snapshot, quick',
         },
         snapshot: {
           type: 'object',
@@ -111,14 +123,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'replan',
     description:
-      'Regenerate sub-task DAG and abort/recreate intentions upon unexpected blockers or environmental state changes.',
+      'Regenerate sub-task DAG and adjust intentions upon unexpected obstacles or state changes (actions: blocker, event, full). Use replan instead of set_goal when recovering from execution blockers or environment shifts rather than creating new goals.\n\nReturns replanned goal DAG, invalidated intentions, and newly synthesized subgoals.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['blocker', 'event', 'full'],
-          description: 'Replanning trigger type',
+          description: 'Replanning trigger type: blocker, event, full',
         },
         goal_id: { type: 'string', description: 'ID of goal to replan' },
         blocker_description: {
@@ -138,14 +150,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'assess_risk',
     description:
-      'Compute quantitative risk and threat assessment for candidate actions or plans against active utility weights.',
+      'Compute quantitative risk and threat assessment for candidate actions or plans against active utility weights (actions: action, plan, compare). Use assess_risk instead of evaluate_situation when estimating failure probability and threat exposure rather than ranking overall utility.\n\nReturns risk score (0.0-1.0), threat breakdown, and comparative risk ratings.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['action', 'plan', 'compare'],
-          description: 'Risk assessment mode',
+          description: 'Risk assessment mode: action, plan, compare',
         },
         candidate_action: { type: 'string', description: 'Action name to evaluate' },
         parameters: { type: 'object', description: 'Action parameters' },
@@ -173,14 +185,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'query_knowledge',
     description:
-      'Search learned heuristic patterns, tactics, and past decision traces by context similarity.',
+      'Search learned heuristic patterns, tactics, and past decision traces by context similarity (actions: search, patterns, similar_situations). Use query_knowledge instead of get_decision_trace when retrieving generalized patterns across sessions rather than inspecting a single execution trace.\n\nReturns matching heuristics, anti-patterns, tactics, and similarity scores.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['search', 'patterns', 'similar_situations'],
-          description: 'Knowledge query mode',
+          description: 'Knowledge query mode: search, patterns, similar_situations',
         },
         query: { type: 'string', description: 'Semantic search query string' },
         pattern_type: {
@@ -202,14 +214,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'set_utility_weights',
     description:
-      'Configure and activate multi-attribute utility weights (aggression, caution, greed, exploration, cooperation).',
+      'Configure, inspect, or activate multi-attribute utility weight profiles (actions: configure, get, list, activate). Use set_utility_weights instead of evaluate_situation when defining decision preferences (aggression, caution, greed, exploration) rather than evaluating actions.\n\nReturns configured utility profile, active weight map, or profile directory.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['configure', 'get', 'list', 'activate'],
-          description: 'Profile operation',
+          description: 'Profile operation: configure, get, list, activate',
         },
         name: {
           type: 'string',
@@ -229,14 +241,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'get_decision_trace',
     description:
-      'Retrieve explainable step-by-step chain-of-thought rationale, candidate utilities, and risk assessment for past decisions.',
+      'Retrieve explainable step-by-step chain-of-thought rationale, candidate utilities, and risk assessment for past decisions (actions: latest, get, list, explain). Use get_decision_trace instead of query_knowledge when performing deep forensic analysis of a specific historical decision.\n\nReturns step-by-step reasoning trace, utility breakdown, candidate rankings, and explanation text.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['latest', 'get', 'list', 'explain'],
-          description: 'Trace retrieval operation',
+          description: 'Trace retrieval operation: latest, get, list, explain',
         },
         trace_id: { type: 'string', description: 'Trace ID for get/explain action' },
         goal_id: { type: 'string', description: 'Filter traces by linked goal ID' },
@@ -249,14 +261,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'manage_beliefs',
     description:
-      'Maintain structured belief state with TTL expiration sweeps, exponential confidence decay, and category filtering.',
+      'Maintain structured belief state with TTL expiration sweeps, exponential confidence decay, and category filtering (actions: update, query, expire, reconcile). Use manage_beliefs instead of query_knowledge when managing dynamic agent epistemic state rather than static heuristic patterns.\n\nReturns belief record, query matches, expired belief count, or reconciliation report.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['update', 'query', 'expire', 'reconcile'],
-          description: 'Belief operation',
+          description: 'Belief operation: update, query, expire, reconcile',
         },
         category: {
           type: 'string',
@@ -290,14 +302,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'manage_intentions',
     description:
-      'Queue, dispatch, track, and resolve behavior directives (wire contract) for behavior-mcp.',
+      'Queue, dispatch, track, cancel, or resolve behavior directives for behavior-mcp runtime execution (actions: create, dispatch, get, list, cancel, resolve). Use manage_intentions instead of set_goal when dispatching immediate execution instructions to runtime behaviors rather than managing abstract objectives.\n\nReturns intention record, dispatch status, wire contract payload, or intention list.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['create', 'dispatch', 'get', 'list', 'cancel', 'resolve'],
-          description: 'Intention operation',
+          description: 'Intention operation: create, dispatch, get, list, cancel, resolve',
         },
         intention_id: {
           type: 'string',
@@ -340,7 +352,7 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'manage_reasoning_db',
     description:
-      'Database maintenance, stats, SHA-256 Merkle audit verification, checkpoints save/restore, and diffs.',
+      'Database maintenance, diagnostics, SHA-256 Merkle audit verification, and snapshot management (actions: stats, audit, doctor, snapshot, diff, restore). Use manage_reasoning_db instead of manage_beliefs when performing SQLite storage integrity verification or database snapshot restore.\n\nReturns database diagnostics, Merkle audit tree, snapshot metadata, or diff reports.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -348,7 +360,7 @@ export const toolDefinitions: ToolDefinition[] = [
           type: 'string',
           enum: ['stats', 'audit', 'doctor', 'snapshot', 'diff', 'restore'],
           description:
-            'Database maintenance operation: stats, audit, doctor (health diagnostics), snapshot, diff, restore',
+            'Database maintenance operation: stats, audit, doctor, snapshot, diff, restore',
         },
         name: { type: 'string', description: 'Snapshot name' },
         description: { type: 'string', description: 'Description for snapshot' },
@@ -360,7 +372,7 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'classify',
     description:
-      'Assigns semantic categorical labels to an entity, visual state, task, or state snapshot using deterministic System One calculus.',
+      'Assign semantic categorical labels to an entity, visual state, task, or state snapshot using deterministic System One calculus. Use classify instead of ask_choice when assigning predefined taxonomy labels rather than selecting among runtime decision alternatives.\n\nReturns top class label, probability distribution, and classification margin.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -385,7 +397,7 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'ask_noul',
     description:
-      'Evaluates whether a specific proposition is true given the current state pack with calibrated probability and L1 abstain safeguards.',
+      'Evaluate whether a specific proposition is true given the current state pack with calibrated probability and abstain safeguards. Use ask_noul instead of ask_score when evaluating binary truth/falsehood rather than scoring an entity on a continuous scale.\n\nReturns boolean answer, confidence probability, and abstain flag.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -400,7 +412,7 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'ask_choice',
     description:
-      'Selects 1 option from a discrete set of alternatives (N <= 16) with probability distribution and utility margin.',
+      'Select 1 option from a discrete set of alternatives (N <= 16) with probability distribution and utility margin. Use ask_choice instead of classify when choosing the best action or alternative under active utility profiles rather than categorizing an entity.\n\nReturns selected option ID, probability distribution, and utility margin.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -427,7 +439,8 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'ask_score',
-    description: 'Evaluates an entity, plan, or action on a bounded continuous scale.',
+    description:
+      'Evaluate an entity, plan, or action on a bounded continuous scale against weighted criteria. Use ask_score instead of ask_noul when evaluating continuous numeric quality or fitness rather than binary truth.\n\nReturns normalized score within scale bounds, criterion breakdown, and evaluation confidence.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -455,7 +468,7 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'gate_intention',
     description:
-      'Evaluates an intention before dispatching to behavior-mcp and issues a cryptographic HMAC dispatch token if approved.',
+      'Evaluate an intention before dispatching to behavior-mcp and issue a cryptographic HMAC dispatch token if approved. Use gate_intention instead of manage_intentions when verifying precondition safety and issuing execution authorization rather than tracking intention state.\n\nReturns gate verdict (approved/rejected), risk evaluation, and HMAC dispatch token.',
     inputSchema: {
       type: 'object',
       properties: {

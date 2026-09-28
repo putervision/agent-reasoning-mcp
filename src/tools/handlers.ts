@@ -1,5 +1,5 @@
 import { McpError, ErrorCode, NativeMcpServer } from '../transport/native-mcp.js';
-import { toolDefinitions, READ_ONLY_TOOLS } from './definitions.js';
+import { toolDefinitions, READ_ONLY_TOOLS, DESTRUCTIVE_TOOLS } from './definitions.js';
 import { getDb, getReadOnlyDb, getProjectSlug } from '../engine/db.js';
 import { GoalEngine } from '../engine/goals.js';
 import { BeliefEngine } from '../engine/beliefs.js';
@@ -80,9 +80,6 @@ export function registerAllTools(server: any): void {
 
     const isReadOnly = READ_ONLY_TOOLS.has(def.name);
     const effectiveSchema = JSON.parse(JSON.stringify(def.inputSchema));
-    if (effectiveSchema.properties?.action) {
-      delete effectiveSchema.properties.action.enum;
-    }
 
     const toolHandler = async (args: any, extra?: { signal?: AbortSignal }) => {
       try {
@@ -99,7 +96,7 @@ export function registerAllTools(server: any): void {
         }
         const project = getProjectSlug(String(projectSlug).trim());
         if (args) args.project = project;
-        const isReadOnlyDb = READ_ONLY_TOOLS.has(def.name);
+        const isReadOnlyDb = def.name === 'assess_risk';
         const db = isReadOnlyDb ? getReadOnlyDb(project) : getDb(project);
 
         let result: any;
@@ -473,7 +470,8 @@ export function registerAllTools(server: any): void {
           rawJsonSchema: effectiveSchema,
           annotations: {
             readOnlyHint: isReadOnly,
-            destructiveHint: false,
+            destructiveHint: DESTRUCTIVE_TOOLS.has(def.name),
+            idempotentHint: isReadOnly,
             openWorldHint: false,
           },
         },
