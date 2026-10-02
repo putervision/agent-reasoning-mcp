@@ -1,6 +1,6 @@
 {
   "name": "@putervision/agent-reasoning-mcp",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Strategic BDI reasoning engine for autonomous AI agents — goal decomposition, utility scoring, risk evaluation, and reactive replanning over PuterVision memory and world models.",
   "keywords": [
     "mcp",

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-02
+
+### 🚀 Spatial Utility Scoring, Rollout Risk & Affordance Gating
+- **Spatial Utility Modulations**: Integrated spatial distance penalty, occlusion penalties, and affordance bonuses/penalties (`TRAVERSABLE: 1`, `OCCLUDER: 2`, `INTERACTABLE: 8`, `THREAT: 16`) into situation action candidate evaluation.
+- **Physics-Aware Rollout Risk**: Added `assess_risk(action: 'spatial_rollout')` computing trajectory collision probabilities, clearance violations, and suggested mitigations.
+- **Spatial Belief Reconciliation**: Added `manage_beliefs(action: 'reconcile_spatial')` aligning world model entities with belief confidence decay and novel entity assertion.
+- **Dynamic Utility Nudging**: Added `set_utility_weights(action: 'nudge')` for safe, bounded incremental utility profile adjustments.
+- **Fast-Path Perception Escalation**: Enhanced `ask_noul` with automatic perception escalation recommendations on uncertain condition queries.
+- **Manifest Synchronization**: Synchronized package manifests, bumped version to 0.4.0, and updated tool documentation.
+
 ## [0.3.1] - 2026-09-28
 
 ### 🛠️ Glama TDQS Optimizations & MCP Annotations
