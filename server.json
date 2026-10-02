@@ -3,7 +3,7 @@
   "name": "io.github.putervision/agent-reasoning-mcp",
   "version": "0.4.0",
   "title": "Strategic Agent Reasoning MCP",
-  "description": "Strategic BDI reasoning engine for autonomous AI agents — goals, spatial utility, risk assessment, and replanning.",
+  "description": "Strategic BDI reasoning engine for autonomous AI agents with spatial utility and replanning.",
   "publisher": "PuterVision",
   "license": "MIT",
   "websiteUrl": "https://agentreasoningmcp.com",
