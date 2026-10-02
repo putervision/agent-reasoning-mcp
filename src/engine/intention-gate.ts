@@ -167,7 +167,7 @@ export class IntentionGateEngine {
       if (targetEntity) {
         const entityMask = targetEntity.affordance_mask ?? 0;
         const isThreat =
-          ((entityMask & AffordanceBitmask.THREAT) !== 0) ||
+          (entityMask & AffordanceBitmask.THREAT) !== 0 ||
           /hostile|enemy|threat/i.test(targetEntity.status);
 
         if (isThreat) {

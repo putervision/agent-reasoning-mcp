@@ -189,10 +189,7 @@ export class RiskEngine {
 
     const riskScore = Math.min(
       1.0,
-      Math.max(
-        0.0,
-        0.5 * collisionProbability + 0.3 * clearancePenalty + 0.2 * affordancePenalty
-      )
+      Math.max(0.0, 0.5 * collisionProbability + 0.3 * clearancePenalty + 0.2 * affordancePenalty)
     );
 
     let threat_level: 'none' | 'low' | 'medium' | 'high' | 'critical' = 'none';
@@ -214,7 +211,8 @@ export class RiskEngine {
 
     return {
       collision_probability: Math.round(collisionProbability * 1000) / 1000,
-      obstacle_clearance: minClearance === Infinity ? 999.0 : Math.round(minClearance * 1000) / 1000,
+      obstacle_clearance:
+        minClearance === Infinity ? 999.0 : Math.round(minClearance * 1000) / 1000,
       affordance_violations: affordanceViolations,
       risk_score: Math.round(riskScore * 1000) / 1000,
       threat_level,

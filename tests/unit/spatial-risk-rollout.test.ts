@@ -64,7 +64,9 @@ describe('Spatial Rollout Risk Assessment', () => {
       ],
     });
 
-    expect(result.affordance_violations.some((v) => v.includes('THREAT') || v.includes('lava_pit'))).toBe(true);
+    expect(
+      result.affordance_violations.some((v) => v.includes('THREAT') || v.includes('lava_pit'))
+    ).toBe(true);
     expect(result.threat_level).toMatch(/high|critical/);
   });
 });

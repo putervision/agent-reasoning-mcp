@@ -121,6 +121,8 @@ describe('Spatial Belief Reconciliation, Intention Affordance Gating & Perceptio
     expect(res.reasons).toContain('INSUFFICIENT_FEATURES_ABSTAIN');
     expect(res.perception_escalation).toBeDefined();
     expect(res.perception_escalation?.recommended).toBe(true);
-    expect(res.perception_escalation?.subgoal_title).toContain('Perception Escalation: inspect door');
+    expect(res.perception_escalation?.subgoal_title).toContain(
+      'Perception Escalation: inspect door'
+    );
   });
 });

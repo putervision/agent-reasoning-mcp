@@ -134,10 +134,8 @@ export class EvaluatorEngine {
       reasoning_chain.push(`Quick context: ${params.quick_context}`);
     }
 
-    const observerPos: [number, number, number] =
-      worldData?.observer_position ||
-      worldData?.spatial_slice?.observer_position ||
-      [0, 0, 0];
+    const observerPos: [number, number, number] = worldData?.observer_position ||
+      worldData?.spatial_slice?.observer_position || [0, 0, 0];
 
     // Score candidates with situational modulation
     const scoredCandidates: CandidateAction[] = candidates.map((c) => {
@@ -175,29 +173,42 @@ export class EvaluatorEngine {
       let threat_penalty = 0;
       let affordance_bonus = 0;
 
-      const targetId = (c.parameters?.target_entity_id || c.parameters?.target_id) as string | undefined;
-      const targetEntity = worldData?.entities.find((e) => e.id === targetId) ||
+      const targetId = (c.parameters?.target_entity_id || c.parameters?.target_id) as
+        string | undefined;
+      const targetEntity =
+        worldData?.entities.find((e) => e.id === targetId) ||
         worldData?.spatial_slice?.nearby_entities.find((e) => e.id === targetId);
 
       // 1. Distance penalty
       let dist: number | undefined;
       if (c.parameters?.distance !== undefined) {
         dist = Number(c.parameters.distance);
-      } else if (targetEntity && 'distance' in targetEntity && typeof targetEntity.distance === 'number') {
+      } else if (
+        targetEntity &&
+        'distance' in targetEntity &&
+        typeof targetEntity.distance === 'number'
+      ) {
         dist = targetEntity.distance;
-      } else if (Array.isArray(c.parameters?.target_position) && c.parameters.target_position.length === 3) {
+      } else if (
+        Array.isArray(c.parameters?.target_position) &&
+        c.parameters.target_position.length === 3
+      ) {
         const tp = c.parameters.target_position as number[];
         dist = Math.sqrt(
           (tp[0] - observerPos[0]) ** 2 +
-          (tp[1] - observerPos[1]) ** 2 +
-          (tp[2] - observerPos[2]) ** 2
+            (tp[1] - observerPos[1]) ** 2 +
+            (tp[2] - observerPos[2]) ** 2
         );
-      } else if (targetEntity && 'position' in targetEntity && Array.isArray(targetEntity.position)) {
+      } else if (
+        targetEntity &&
+        'position' in targetEntity &&
+        Array.isArray(targetEntity.position)
+      ) {
         const ep = targetEntity.position as number[];
         dist = Math.sqrt(
           (ep[0] - observerPos[0]) ** 2 +
-          (ep[1] - observerPos[1]) ** 2 +
-          (ep[2] - observerPos[2]) ** 2
+            (ep[1] - observerPos[1]) ** 2 +
+            (ep[2] - observerPos[2]) ** 2
         );
       }
 
@@ -238,26 +249,30 @@ export class EvaluatorEngine {
             : undefined);
 
       if (affordanceMask !== undefined) {
-        if ((affordanceMask & AffordanceBitmask.TRAVERSABLE) !== 0) affordance_bonus += 0.10;
+        if ((affordanceMask & AffordanceBitmask.TRAVERSABLE) !== 0) affordance_bonus += 0.1;
         if ((affordanceMask & AffordanceBitmask.INTERACTABLE) !== 0) affordance_bonus += 0.15;
         if ((affordanceMask & AffordanceBitmask.CONTAINER) !== 0) affordance_bonus += 0.05;
         if ((affordanceMask & AffordanceBitmask.OCCLUDER) !== 0) affordance_bonus -= 0.05;
-        if ((affordanceMask & AffordanceBitmask.THREAT) !== 0) affordance_bonus -= 0.20;
+        if ((affordanceMask & AffordanceBitmask.THREAT) !== 0) affordance_bonus -= 0.2;
       }
 
       // Update utility breakdown and estimated utility
       if (candidateScored.utility_breakdown) {
         if (distance_penalty > 0) {
-          candidateScored.utility_breakdown.distance_penalty = -Math.round(distance_penalty * 1000) / 1000;
+          candidateScored.utility_breakdown.distance_penalty =
+            -Math.round(distance_penalty * 1000) / 1000;
         }
         if (occlusion_penalty > 0) {
-          candidateScored.utility_breakdown.occlusion_penalty = -Math.round(occlusion_penalty * 1000) / 1000;
+          candidateScored.utility_breakdown.occlusion_penalty =
+            -Math.round(occlusion_penalty * 1000) / 1000;
         }
         if (threat_penalty > 0) {
-          candidateScored.utility_breakdown.threat_penalty = -Math.round(threat_penalty * 1000) / 1000;
+          candidateScored.utility_breakdown.threat_penalty =
+            -Math.round(threat_penalty * 1000) / 1000;
         }
         if (affordance_bonus !== 0) {
-          candidateScored.utility_breakdown.affordance_bonus = Math.round(affordance_bonus * 1000) / 1000;
+          candidateScored.utility_breakdown.affordance_bonus =
+            Math.round(affordance_bonus * 1000) / 1000;
         }
       }
 
@@ -265,7 +280,11 @@ export class EvaluatorEngine {
         0.0,
         Math.min(
           1.0,
-          candidateScored.estimated_utility + affordance_bonus - distance_penalty - occlusion_penalty - threat_penalty
+          candidateScored.estimated_utility +
+            affordance_bonus -
+            distance_penalty -
+            occlusion_penalty -
+            threat_penalty
         )
       );
 

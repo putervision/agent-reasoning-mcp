@@ -289,7 +289,9 @@ export class BeliefEngine {
     );
     for (const entity of missing) {
       const rows = db
-        .prepare('SELECT id, confidence FROM beliefs WHERE project = ? AND category = ? AND subject = ?')
+        .prepare(
+          'SELECT id, confidence FROM beliefs WHERE project = ? AND category = ? AND subject = ?'
+        )
         .all(params.project, 'spatial', entity.id) as any[];
 
       for (const row of rows) {
