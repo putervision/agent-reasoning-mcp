@@ -1,6 +1,6 @@
 # 🚀 Migration Guide: @putervision/agent-reasoning-mcp
 
-This guide explains how to migrate client integrations, custom agents, and tool callers to the unified **v0.3.1+ API** with native transport, bounded lookahead evaluation, and canonical resources.
+This guide explains how to migrate client integrations, custom agents, and tool callers to the unified **v0.4.0+ API** with native transport, bounded lookahead evaluation, spatial utility modulation, and canonical resources.
 
 ---
 
@@ -58,3 +58,8 @@ const result = await client.callTool({
 });
 ```
 Candidate actions receive discounted heuristic projections ($\gamma = 0.85$ per step) and return ranking along with confidence metrics.
+
+### 5. Spatial Utility Modulation & Rollout Risk (v0.4.0)
+- `evaluate_situation` dynamically modulates expected utility scores using 3D spatial entity density and proximity hazards.
+- `assess_risk` supports quantitative threat evaluation incorporating simulated obstacle collision probabilities and spatial safety buffers.
+- `manage_beliefs` provides exponential confidence decay for occluded entities and spatial coordinate anchors.

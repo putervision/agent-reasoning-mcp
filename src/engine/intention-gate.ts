@@ -5,6 +5,7 @@ import {
   DispatchToken,
   DecisionReason,
   StatePack,
+  AffordanceBitmask,
 } from '../schema/types.js';
 import { RiskEngine } from './risk.js';
 import { getPentadHmacSecret, getDispatchTokenTtlMs } from './config.js';
@@ -152,6 +153,52 @@ export class IntentionGateEngine {
     ) {
       policy_violations.push('Agent in critical health state; offensive engagement forbidden');
       reasons.push('CRITICAL_VITALS_HP');
+    }
+
+    // Spatial affordance & threat blast-radius checking (§5)
+    const targetEntityId = actionParams.target_entity_id as string | undefined;
+    const requiredAffordances =
+      typeof actionParams.required_affordances === 'number'
+        ? actionParams.required_affordances
+        : undefined;
+
+    if (targetEntityId) {
+      const targetEntity = pack.spatial?.nearby_entities?.find((e) => e.id === targetEntityId);
+      if (targetEntity) {
+        const entityMask = targetEntity.affordance_mask ?? 0;
+        const isThreat =
+          (entityMask & AffordanceBitmask.THREAT) !== 0 ||
+          /hostile|enemy|threat/i.test(targetEntity.status);
+
+        if (isThreat) {
+          if (!/flee|retreat|combat|attack|engage/i.test(behaviorName)) {
+            blast_radius = 'critical';
+            policy_violations.push(
+              `Target entity '${targetEntityId}' has THREAT affordance; non-defensive behavior '${behaviorName}' rejected`
+            );
+            reasons.push('AFFORDANCE_VIOLATION');
+          } else {
+            blast_radius = 'high';
+          }
+        }
+
+        if (requiredAffordances !== undefined) {
+          if ((entityMask & requiredAffordances) !== requiredAffordances) {
+            policy_violations.push(
+              `Target entity '${targetEntityId}' lacks required affordance mask (required: ${requiredAffordances}, actual: ${entityMask})`
+            );
+            reasons.push('AFFORDANCE_VIOLATION');
+          }
+        }
+      }
+    } else if (requiredAffordances !== undefined) {
+      const spatialMask = pack.spatial?.affordance_mask ?? 0;
+      if ((spatialMask & requiredAffordances) !== requiredAffordances) {
+        policy_violations.push(
+          `Environment lacks required affordance mask (required: ${requiredAffordances}, actual: ${spatialMask})`
+        );
+        reasons.push('AFFORDANCE_VIOLATION');
+      }
     }
 
     // Determine verdict

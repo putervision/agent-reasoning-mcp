@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { Belief, BeliefId, BeliefCategory } from '../schema/types.js';
+import { Belief, BeliefId, BeliefCategory, SpatialReconciliationResult } from '../schema/types.js';
 import { generateId } from '../utils/id.js';
 import { getCurrentIsoString } from '../utils/time.js';
 import { safeJsonParse, safeJsonStringify } from '../utils/json-validator.js';
@@ -223,6 +223,142 @@ export class BeliefEngine {
       .get(params.project, params.id) as any;
     if (!row) throw new NotFoundError(`Belief ${params.id} not found.`);
     return this.mapRowToBelief(row);
+  }
+
+  static reconcileSpatial(
+    db: Database.Database,
+    params: {
+      project: string;
+      matched_entities?: Array<{
+        id: string;
+        position?: [number, number, number];
+        status?: string;
+        affordance_mask?: number;
+        confidence?: number;
+      }>;
+      missing_entities?: Array<{
+        id: string;
+        reason?: string;
+      }>;
+      unexpected_entities?: Array<{
+        id: string;
+        position?: [number, number, number];
+        status?: string;
+        affordance_mask?: number;
+        confidence?: number;
+      }>;
+      novel_entities?: Array<{
+        id: string;
+        position?: [number, number, number];
+        status?: string;
+        affordance_mask?: number;
+        confidence?: number;
+      }>;
+    }
+  ): SpatialReconciliationResult {
+    const matched = params.matched_entities || [];
+    const missing = params.missing_entities || [];
+    const unexpected = params.unexpected_entities || [];
+    const novel = params.novel_entities || [];
+
+    const updatedBeliefIds: string[] = [];
+    const now = getCurrentIsoString();
+
+    // 1. Process matched entities: reinforce spatial beliefs
+    for (const entity of matched) {
+      const b = this.updateBelief(db, {
+        project: params.project,
+        category: 'spatial',
+        subject: entity.id,
+        predicate: 'location',
+        object: {
+          position: entity.position,
+          status: entity.status,
+          affordance_mask: entity.affordance_mask,
+        },
+        confidence: Math.min(1.0, (entity.confidence ?? 0.9) + 0.05),
+        source: 'observation',
+      });
+      updatedBeliefIds.push(b.id);
+    }
+
+    // 2. Process missing entities: decay confidence
+    let decayedCount = 0;
+    const decayMissingStmt = db.prepare(
+      'UPDATE beliefs SET confidence = ?, last_decayed_at = ?, updated_at = ? WHERE id = ?'
+    );
+    for (const entity of missing) {
+      const rows = db
+        .prepare(
+          'SELECT id, confidence FROM beliefs WHERE project = ? AND category = ? AND subject = ?'
+        )
+        .all(params.project, 'spatial', entity.id) as any[];
+
+      for (const row of rows) {
+        const newConf = Math.max(0.01, row.confidence * 0.5);
+        decayMissingStmt.run(newConf, now, now, row.id);
+        updatedBeliefIds.push(row.id);
+        decayedCount++;
+      }
+    }
+
+    // 3. Process unexpected entities
+    for (const entity of unexpected) {
+      const b = this.updateBelief(db, {
+        project: params.project,
+        category: 'spatial',
+        subject: entity.id,
+        predicate: 'unexpected_presence',
+        object: {
+          position: entity.position,
+          status: entity.status,
+          affordance_mask: entity.affordance_mask,
+        },
+        confidence: entity.confidence ?? 0.85,
+        source: 'observation',
+      });
+      updatedBeliefIds.push(b.id);
+    }
+
+    // 4. Process novel entities
+    for (const entity of novel) {
+      const b = this.updateBelief(db, {
+        project: params.project,
+        category: 'spatial',
+        subject: entity.id,
+        predicate: 'discovered',
+        object: {
+          position: entity.position,
+          status: entity.status,
+          affordance_mask: entity.affordance_mask,
+        },
+        confidence: entity.confidence ?? 0.9,
+        source: 'observation',
+      });
+      updatedBeliefIds.push(b.id);
+    }
+
+    logReasoningEvent(db, {
+      project: params.project,
+      entity_id: `reconcile_${Date.now()}`,
+      entity_type: 'belief',
+      action: 'reconcile_spatial',
+      details: {
+        matched_count: matched.length,
+        decayed_missing_count: decayedCount,
+        unexpected_count: unexpected.length,
+        novel_count: novel.length,
+      },
+    });
+
+    return {
+      matched_count: matched.length,
+      decayed_missing_count: decayedCount,
+      unexpected_count: unexpected.length,
+      novel_count: novel.length,
+      updated_belief_ids: updatedBeliefIds,
+      reconciled_at: now,
+    };
   }
 
   private static mapRowToBelief(row: any): Belief {

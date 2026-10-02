@@ -183,7 +183,13 @@ export function registerAllTools(server: any): void {
           }
 
           case 'assess_risk': {
-            if (args.action === 'compare' && args.candidate_actions) {
+            if (args.action === 'spatial_rollout') {
+              result = RiskEngine.assessSpatialRollout({
+                trajectory: args.trajectory,
+                obstacles: args.obstacles,
+                clearance_threshold: args.clearance_threshold,
+              });
+            } else if (args.action === 'compare' && args.candidate_actions) {
               result = args.candidate_actions.map((c: any) => ({
                 action: c.action,
                 risk: RiskEngine.assessAction(c.action, c.parameters, args.situation_context),
@@ -207,6 +213,12 @@ export function registerAllTools(server: any): void {
             const action = args.action;
             if (action === 'configure') {
               result = UtilityProfileEngine.configureProfile(db, { project, ...args });
+            } else if (action === 'nudge') {
+              result = UtilityProfileEngine.nudgeProfile(db, {
+                project,
+                name: args.name,
+                delta: args.delta || args.weights || {},
+              });
             } else if (action === 'get') {
               result = args.name
                 ? UtilityProfileEngine.getProfile(db, { project, name: args.name })
@@ -259,6 +271,14 @@ export function registerAllTools(server: any): void {
             } else if (action === 'reconcile') {
               BeliefEngine.decayBeliefs(db, project);
               result = { message: 'Beliefs successfully reconciled and decayed.' };
+            } else if (action === 'reconcile_spatial') {
+              result = BeliefEngine.reconcileSpatial(db, {
+                project,
+                matched_entities: args.matched_entities,
+                missing_entities: args.missing_entities,
+                unexpected_entities: args.unexpected_entities,
+                novel_entities: args.novel_entities,
+              });
             } else {
               throw new ValidationError(`Unknown action "${action}" for manage_beliefs.`);
             }

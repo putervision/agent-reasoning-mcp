@@ -158,6 +158,35 @@ export class UtilityProfileEngine {
     return { ...profile, is_active: true };
   }
 
+  static nudgeProfile(
+    db: Database.Database,
+    params: {
+      project: string;
+      name?: string;
+      delta: Record<string, number>;
+    }
+  ): UtilityProfile {
+    const profile = params.name
+      ? this.getProfile(db, { project: params.project, name: params.name })
+      : this.getActiveProfile(db, params.project);
+
+    const newWeights: Record<string, number> = { ...profile.weights };
+    for (const [key, deltaVal] of Object.entries(params.delta)) {
+      if (typeof deltaVal !== 'number' || isNaN(deltaVal)) continue;
+      const current = newWeights[key] ?? 0.5;
+      const updated = Math.max(0.0, Math.min(1.0, current + deltaVal));
+      newWeights[key] = Math.round(updated * 1000) / 1000;
+    }
+
+    return this.configureProfile(db, {
+      project: params.project,
+      name: profile.name,
+      description: profile.description,
+      weights: newWeights,
+      is_active: profile.is_active,
+    });
+  }
+
   private static mapRowToProfile(row: any): UtilityProfile {
     return {
       id: row.id as ProfileId,

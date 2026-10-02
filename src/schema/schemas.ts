@@ -368,7 +368,7 @@ export const ReplanSchema = z.object({
 });
 
 export const AssessRiskSchema = z.object({
-  action: z.enum(['action', 'plan', 'compare']),
+  action: z.enum(['action', 'plan', 'compare', 'spatial_rollout']),
   candidate_action: z.string().optional(),
   parameters: z.record(z.any()).optional(),
   candidate_actions: z
@@ -379,6 +379,9 @@ export const AssessRiskSchema = z.object({
       })
     )
     .optional(),
+  trajectory: z.array(z.array(z.number())).optional(),
+  obstacles: z.array(z.any()).optional(),
+  clearance_threshold: z.number().optional(),
   situation_context: z.any().optional(),
   project: z.string().optional(),
 });
@@ -393,10 +396,11 @@ export const QueryKnowledgeSchema = z.object({
 });
 
 export const SetUtilityWeightsSchema = z.object({
-  action: z.enum(['configure', 'get', 'list', 'activate']),
+  action: z.enum(['configure', 'get', 'list', 'activate', 'nudge']),
   name: z.string().optional(),
   description: z.string().optional(),
   weights: z.record(z.number()).optional(),
+  delta: z.record(z.number()).optional(),
   is_active: z.boolean().optional(),
   project: z.string().optional(),
 });
@@ -410,7 +414,7 @@ export const GetDecisionTraceSchema = z.object({
 });
 
 export const ManageBeliefsSchema = z.object({
-  action: z.enum(['update', 'query', 'expire', 'reconcile']),
+  action: z.enum(['update', 'query', 'expire', 'reconcile', 'reconcile_spatial']),
   category: z.enum(['spatial', 'entity', 'state', 'rule', 'social']).optional(),
   subject: z.string().optional(),
   predicate: z.string().optional(),
@@ -421,6 +425,10 @@ export const ManageBeliefsSchema = z.object({
   decay_rate: z.number().optional(),
   belief_id: z.string().optional(),
   client_request_id: z.string().optional(),
+  matched_entities: z.array(z.any()).optional(),
+  missing_entities: z.array(z.any()).optional(),
+  unexpected_entities: z.array(z.any()).optional(),
+  novel_entities: z.array(z.any()).optional(),
   project: z.string().optional(),
 });
 
