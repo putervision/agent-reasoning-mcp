@@ -150,14 +150,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'assess_risk',
     description:
-      'Compute quantitative risk and threat assessment for candidate actions or plans against active utility weights (actions: action, plan, compare). Use assess_risk instead of evaluate_situation when estimating failure probability and threat exposure rather than ranking overall utility.\n\nReturns risk score (0.0-1.0), threat breakdown, and comparative risk ratings.',
+      'Compute quantitative risk and threat assessment for candidate actions, plans, or 3D spatial rollouts against active utility weights (actions: action, plan, compare, spatial_rollout). Use assess_risk instead of evaluate_situation when estimating failure probability and threat exposure rather than ranking overall utility.\n\nReturns risk score (0.0-1.0), threat breakdown, and comparative risk ratings.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
-          enum: ['action', 'plan', 'compare'],
-          description: 'Risk assessment mode: action, plan, compare',
+          enum: ['action', 'plan', 'compare', 'spatial_rollout'],
+          description: 'Risk assessment mode: action, plan, compare, spatial_rollout',
         },
         candidate_action: { type: 'string', description: 'Action name to evaluate' },
         parameters: { type: 'object', description: 'Action parameters' },
@@ -172,6 +172,22 @@ export const toolDefinitions: ToolDefinition[] = [
             required: ['action'],
           },
           description: 'Multiple actions to compare risk scores',
+        },
+        trajectory: {
+          type: 'array',
+          items: {
+            type: 'array',
+            items: { type: 'number' },
+          },
+          description: 'Array of [x, y, z] waypoints for spatial rollout risk assessment',
+        },
+        obstacles: {
+          type: 'array',
+          description: 'Obstacles with position/bounding_box and affordance_mask',
+        },
+        clearance_threshold: {
+          type: 'number',
+          description: 'Minimum clearance threshold in meters (default: 1.0)',
         },
         situation_context: {
           type: 'object',
@@ -214,14 +230,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'set_utility_weights',
     description:
-      'Configure, inspect, or activate multi-attribute utility weight profiles (actions: configure, get, list, activate). Use set_utility_weights instead of evaluate_situation when defining decision preferences (aggression, caution, greed, exploration) rather than evaluating actions.\n\nReturns configured utility profile, active weight map, or profile directory.',
+      'Configure, inspect, activate, or incrementally nudge multi-attribute utility weight profiles (actions: configure, get, list, activate, nudge). Use set_utility_weights instead of evaluate_situation when defining decision preferences (aggression, caution, greed, exploration) rather than evaluating actions.\n\nReturns configured utility profile, active weight map, or profile directory.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
-          enum: ['configure', 'get', 'list', 'activate'],
-          description: 'Profile operation: configure, get, list, activate',
+          enum: ['configure', 'get', 'list', 'activate', 'nudge'],
+          description: 'Profile operation: configure, get, list, activate, nudge',
         },
         name: {
           type: 'string',
@@ -231,6 +247,10 @@ export const toolDefinitions: ToolDefinition[] = [
         weights: {
           type: 'object',
           description: 'Key-value map of weight values (0.0 to 1.0)',
+        },
+        delta: {
+          type: 'object',
+          description: 'Key-value map of weight deltas for nudge action',
         },
         is_active: { type: 'boolean', description: 'Whether to set as currently active profile' },
         project: { type: 'string', description: 'Target project slug' },
@@ -261,14 +281,14 @@ export const toolDefinitions: ToolDefinition[] = [
   {
     name: 'manage_beliefs',
     description:
-      'Maintain structured belief state with TTL expiration sweeps, exponential confidence decay, and category filtering (actions: update, query, expire, reconcile). Use manage_beliefs instead of query_knowledge when managing dynamic agent epistemic state rather than static heuristic patterns.\n\nReturns belief record, query matches, expired belief count, or reconciliation report.',
+      'Maintain structured belief state with TTL expiration sweeps, exponential confidence decay, and category filtering (actions: update, query, expire, reconcile, reconcile_spatial). Use manage_beliefs instead of query_knowledge when managing dynamic agent epistemic state rather than static heuristic patterns.\n\nReturns belief record, query matches, expired belief count, or reconciliation report.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
-          enum: ['update', 'query', 'expire', 'reconcile'],
-          description: 'Belief operation: update, query, expire, reconcile',
+          enum: ['update', 'query', 'expire', 'reconcile', 'reconcile_spatial'],
+          description: 'Belief operation: update, query, expire, reconcile, reconcile_spatial',
         },
         category: {
           type: 'string',
@@ -294,6 +314,22 @@ export const toolDefinitions: ToolDefinition[] = [
         decay_rate: { type: 'number', description: 'Exponential decay rate lambda per hour' },
         belief_id: { type: 'string', description: 'Belief ID for specific lookup' },
         client_request_id: { type: 'string', description: 'Idempotency key' },
+        matched_entities: {
+          type: 'array',
+          description: 'Matched entities for reconcile_spatial action',
+        },
+        missing_entities: {
+          type: 'array',
+          description: 'Missing entities for reconcile_spatial action',
+        },
+        unexpected_entities: {
+          type: 'array',
+          description: 'Unexpected entities for reconcile_spatial action',
+        },
+        novel_entities: {
+          type: 'array',
+          description: 'Novel entities for reconcile_spatial action',
+        },
         project: { type: 'string', description: 'Target project slug' },
       },
       required: ['action'],

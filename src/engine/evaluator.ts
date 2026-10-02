@@ -1,12 +1,12 @@
 import Database from 'better-sqlite3';
-import { SituationSnapshot, CandidateAction } from '../schema/types.js';
+import { SituationSnapshot, CandidateAction, AffordanceBitmask } from '../schema/types.js';
 import { UtilityProfileEngine } from './personality.js';
 import { UtilityEngine } from './utility.js';
 import { RiskEngine } from './risk.js';
 import { DecisionTraceEngine } from './traces.js';
 import { StateBridge } from './bridge/state-bridge.js';
 import { VisionBridge } from './bridge/vision-bridge.js';
-import { WorldBridge } from './bridge/world-bridge.js';
+import { WorldBridge, WorldBridgeData } from './bridge/world-bridge.js';
 
 export class EvaluatorEngine {
   static evaluateSituation(
@@ -55,6 +55,7 @@ export class EvaluatorEngine {
 
     let threatLevel = 0.0;
     let currentHp = 100;
+    let worldData: WorldBridgeData | undefined;
 
     if (params.snapshot) {
       reasoning_chain.push(
@@ -99,10 +100,13 @@ export class EvaluatorEngine {
 
       // 3. World Model Bridge hydration
       if (params.snapshot.world) {
-        const worldData = WorldBridge.normalizeWorldData(params.snapshot.world);
+        worldData = WorldBridge.normalizeWorldData(params.snapshot.world);
         if (worldData.entities.length > 0) {
           const hostileCount = worldData.entities.filter(
-            (e) => /hostile|enemy|threat/i.test(e.type) || /hostile/i.test(e.status)
+            (e) =>
+              /hostile|enemy|threat/i.test(e.type) ||
+              /hostile/i.test(e.status) ||
+              ((e.affordance_mask ?? 0) & AffordanceBitmask.THREAT) !== 0
           ).length;
           if (hostileCount > 0) {
             threatLevel = Math.max(threatLevel, 0.7);
@@ -115,10 +119,25 @@ export class EvaluatorEngine {
             );
           }
         }
+        if (worldData.spatial_slice) {
+          reasoning_chain.push(
+            `WorldBridge: Hydrated spatial slice with ${worldData.spatial_slice.nearby_entities.length} nearby entities.`
+          );
+        }
+        if (worldData.spatial_predicates && Object.keys(worldData.spatial_predicates).length > 0) {
+          reasoning_chain.push(
+            `WorldBridge: Evaluated ${Object.keys(worldData.spatial_predicates).length} spatial predicates.`
+          );
+        }
       }
     } else if (params.quick_context) {
       reasoning_chain.push(`Quick context: ${params.quick_context}`);
     }
+
+    const observerPos: [number, number, number] =
+      worldData?.observer_position ||
+      worldData?.spatial_slice?.observer_position ||
+      [0, 0, 0];
 
     // Score candidates with situational modulation
     const scoredCandidates: CandidateAction[] = candidates.map((c) => {
@@ -149,6 +168,106 @@ export class EvaluatorEngine {
         profile
       );
       candidateScored.risk_score = risk.risk_score;
+
+      // ── Spatial Scoring Modulation (§2) ──────────────────────────────────
+      let distance_penalty = 0;
+      let occlusion_penalty = 0;
+      let threat_penalty = 0;
+      let affordance_bonus = 0;
+
+      const targetId = (c.parameters?.target_entity_id || c.parameters?.target_id) as string | undefined;
+      const targetEntity = worldData?.entities.find((e) => e.id === targetId) ||
+        worldData?.spatial_slice?.nearby_entities.find((e) => e.id === targetId);
+
+      // 1. Distance penalty
+      let dist: number | undefined;
+      if (c.parameters?.distance !== undefined) {
+        dist = Number(c.parameters.distance);
+      } else if (targetEntity && 'distance' in targetEntity && typeof targetEntity.distance === 'number') {
+        dist = targetEntity.distance;
+      } else if (Array.isArray(c.parameters?.target_position) && c.parameters.target_position.length === 3) {
+        const tp = c.parameters.target_position as number[];
+        dist = Math.sqrt(
+          (tp[0] - observerPos[0]) ** 2 +
+          (tp[1] - observerPos[1]) ** 2 +
+          (tp[2] - observerPos[2]) ** 2
+        );
+      } else if (targetEntity && 'position' in targetEntity && Array.isArray(targetEntity.position)) {
+        const ep = targetEntity.position as number[];
+        dist = Math.sqrt(
+          (ep[0] - observerPos[0]) ** 2 +
+          (ep[1] - observerPos[1]) ** 2 +
+          (ep[2] - observerPos[2]) ** 2
+        );
+      }
+
+      if (dist !== undefined && !isNaN(dist)) {
+        distance_penalty = Math.min(0.25, (dist / 100) * 0.25);
+      }
+
+      // 2. Occlusion penalty
+      if (
+        c.parameters?.occluded === true ||
+        (targetId && worldData?.spatial_predicates?.[`${targetId}_occluded`] === true) ||
+        (targetId && worldData?.spatial_predicates?.[`${targetId}:occluded`] === true)
+      ) {
+        occlusion_penalty = 0.15;
+      }
+
+      // 3. Threat penalty
+      const isTargetThreat =
+        targetEntity &&
+        (((targetEntity.affordance_mask ?? 0) & AffordanceBitmask.THREAT) !== 0 ||
+          /hostile|enemy|threat/i.test((targetEntity as any).status || (targetEntity as any).type));
+
+      if (isTargetThreat) {
+        if (!isCombat && !isEscape) {
+          threat_penalty = Math.max(0.15, threatLevel * 0.3);
+        }
+      } else if (threatLevel > 0.5 && (isGather || isPatrol)) {
+        threat_penalty = threatLevel * 0.2;
+      }
+
+      // 4. Affordance bonus
+      const affordanceMask =
+        targetEntity?.affordance_mask ??
+        (typeof c.parameters?.affordance_mask === 'number'
+          ? c.parameters.affordance_mask
+          : typeof c.parameters?.required_affordances === 'number'
+            ? c.parameters.required_affordances
+            : undefined);
+
+      if (affordanceMask !== undefined) {
+        if ((affordanceMask & AffordanceBitmask.TRAVERSABLE) !== 0) affordance_bonus += 0.10;
+        if ((affordanceMask & AffordanceBitmask.INTERACTABLE) !== 0) affordance_bonus += 0.15;
+        if ((affordanceMask & AffordanceBitmask.CONTAINER) !== 0) affordance_bonus += 0.05;
+        if ((affordanceMask & AffordanceBitmask.OCCLUDER) !== 0) affordance_bonus -= 0.05;
+        if ((affordanceMask & AffordanceBitmask.THREAT) !== 0) affordance_bonus -= 0.20;
+      }
+
+      // Update utility breakdown and estimated utility
+      if (candidateScored.utility_breakdown) {
+        if (distance_penalty > 0) {
+          candidateScored.utility_breakdown.distance_penalty = -Math.round(distance_penalty * 1000) / 1000;
+        }
+        if (occlusion_penalty > 0) {
+          candidateScored.utility_breakdown.occlusion_penalty = -Math.round(occlusion_penalty * 1000) / 1000;
+        }
+        if (threat_penalty > 0) {
+          candidateScored.utility_breakdown.threat_penalty = -Math.round(threat_penalty * 1000) / 1000;
+        }
+        if (affordance_bonus !== 0) {
+          candidateScored.utility_breakdown.affordance_bonus = Math.round(affordance_bonus * 1000) / 1000;
+        }
+      }
+
+      candidateScored.estimated_utility = Math.max(
+        0.0,
+        Math.min(
+          1.0,
+          candidateScored.estimated_utility + affordance_bonus - distance_penalty - occlusion_penalty - threat_penalty
+        )
+      );
 
       if (params.lookahead_depth && params.lookahead_depth > 1) {
         const gamma = 0.85;

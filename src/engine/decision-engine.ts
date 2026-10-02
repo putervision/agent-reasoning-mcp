@@ -453,6 +453,33 @@ export class DecisionEngine {
       escalate = true;
     }
 
+    let perception_escalation:
+      | {
+          recommended: boolean;
+          subgoal_title: string;
+          target?: string;
+          rationale: string;
+        }
+      | undefined = undefined;
+
+    if (escalate) {
+      const targetMatch = stmt.match(
+        /entity[_\s]+([a-zA-Z0-9_-]+)|target[_\s]+([a-zA-Z0-9_-]+)|door|key|chest|player|enemy|item|perimeter|zone/i
+      );
+      const targetName = targetMatch
+        ? targetMatch[1] || targetMatch[2] || targetMatch[0]
+        : pack.spatial?.nearby_entities?.[0]?.id || 'target_region';
+
+      perception_escalation = {
+        recommended: true,
+        subgoal_title: `Perception Escalation: inspect ${targetName}`,
+        target: targetName,
+        rationale: !hasSignal
+          ? 'Insufficient feature evidence in state pack to evaluate proposition (L1 abstain).'
+          : 'High uncertainty in proposition probability evaluation (p in [0.4, 0.6]).',
+      };
+    }
+
     if (reasons.length === 0) {
       reasons.push('RULE_HEURISTIC_MATCH');
     }
@@ -473,6 +500,7 @@ export class DecisionEngine {
         confidence,
         tier,
         reasons,
+        perception_escalation,
         pack_hash: pack.pack_hash,
       },
     });
@@ -485,6 +513,7 @@ export class DecisionEngine {
       calibrated: false,
       reasons,
       escalate_to_system_two: escalate,
+      perception_escalation,
       tier,
       latency_ms,
       pack_hash: pack.pack_hash,

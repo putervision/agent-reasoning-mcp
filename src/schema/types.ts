@@ -87,6 +87,29 @@ export interface RiskAssessmentResult {
   mitigations: string[];
 }
 
+export interface SpatialRolloutRiskResult {
+  collision_probability: number;
+  obstacle_clearance: number;
+  affordance_violations: string[];
+  risk_score: number;
+  threat_level: 'none' | 'low' | 'medium' | 'high' | 'critical';
+  breakdown: {
+    collision_risk: number;
+    clearance_penalty: number;
+    affordance_penalty: number;
+  };
+  mitigations: string[];
+}
+
+export interface SpatialReconciliationResult {
+  matched_count: number;
+  decayed_missing_count: number;
+  unexpected_count: number;
+  novel_count: number;
+  updated_belief_ids: string[];
+  reconciled_at: string;
+}
+
 export interface UtilityProfile {
   id: ProfileId;
   project: string;
@@ -164,9 +187,13 @@ export interface SituationSnapshot {
       type: string;
       position: [number, number, number];
       status: string;
+      affordance_mask?: number;
+      velocity?: [number, number, number];
     }>;
     relations?: Array<{ source: string; relation: string; target: string }>;
     observer_position?: [number, number, number];
+    spatial_slice?: SpatialSlice;
+    spatial_predicates?: Record<string, unknown>;
   };
   vision?: {
     current_state_id?: string;
@@ -210,7 +237,17 @@ export type DecisionReason =
   | 'BELIEF_DECAY_TRIGGER'
   | 'SPATIAL_PROXIMITY_MATCH'
   | 'VISUAL_LAYOUT_MATCH'
-  | 'COOLDOWN_ACTIVE';
+  | 'COOLDOWN_ACTIVE'
+  | 'SPATIAL_COLLISION_RISK'
+  | 'AFFORDANCE_VIOLATION';
+
+export const AffordanceBitmask = {
+  TRAVERSABLE: 1,
+  OCCLUDER: 2,
+  CONTAINER: 4,
+  INTERACTABLE: 8,
+  THREAT: 16,
+} as const;
 
 export interface VisualSlice {
   state_id: string; // Ptr to vision-memory visual_state
@@ -228,7 +265,12 @@ export interface SpatialSlice {
     type: string;
     distance: number; // Euclidean distance in meters
     status: string; // e.g. "hostile", "neutral", "locked"
+    affordance_mask?: number;
+    velocity?: [number, number, number];
   }>; // Max 16 closest entities
+  affordance_mask?: number;
+  velocity?: [number, number, number];
+  spatial_predicates?: Record<string, unknown>;
 }
 
 export interface TaskSlice {
@@ -303,6 +345,12 @@ export interface AskNoulResponse {
   calibrated: boolean;
   reasons: DecisionReason[];
   escalate_to_system_two: boolean; // Set if L1 abstains or uncertainty is high [0.4, 0.6]
+  perception_escalation?: {
+    recommended: boolean;
+    subgoal_title: string;
+    target?: string;
+    rationale: string;
+  };
   tier: 'L1' | 'L2' | 'L3' | 'L4' | 'cache';
   latency_ms: number;
   pack_hash: string;
