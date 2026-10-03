@@ -88,8 +88,12 @@ describe('Config & Tool Error Handling Coverage', () => {
     expect(() => canonicalJsonStringify(Infinity)).toThrow('Invalid non-finite number');
     expect(canonicalJsonStringify(Symbol('test'))).toBe(undefined);
 
+    const fs = await import('fs');
+    const pkg = JSON.parse(
+      fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf-8')
+    );
     const { getVersion } = await import('../../src/utils/version.js');
-    expect(getVersion()).toBe('0.4.0');
+    expect(getVersion()).toBe(pkg.version);
     (globalThis as any).__APP_VERSION__ = '1.2.3';
     expect(getVersion()).toBe('1.2.3');
     delete (globalThis as any).__APP_VERSION__;

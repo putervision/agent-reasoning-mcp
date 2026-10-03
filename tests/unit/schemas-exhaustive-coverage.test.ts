@@ -300,5 +300,16 @@ describe('Exhaustive Schema Validation Suite', () => {
       expect(valid.action).toBe('audit');
       expect(ManageReasoningDbSchema.toJsonSchema().type).toBe('object');
     });
+
+    it('filters __proto__, constructor, and prototype in RecordSchema', () => {
+      const schema = z.record(z.string());
+      const maliciousPayload = JSON.parse(
+        '{"validKey":"safe","__proto__":{"polluted":"yes"},"constructor":"bad","prototype":"bad"}'
+      );
+      const parsed = schema.parse(maliciousPayload);
+      expect(parsed.validKey).toBe('safe');
+      expect(Object.keys(parsed)).toEqual(['validKey']);
+      expect((parsed as any).polluted).toBeUndefined();
+    });
   });
 });
