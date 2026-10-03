@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-10-03
+
+### 🛡️ Security Hardening & Version Metadata Synchronization
+- **Schema Protection**: Added prototype key filtering (`__proto__`, `constructor`, `prototype`) in `RecordSchema` to prevent prototype pollution during dictionary validation.
+- **Shared Dispatch Hash Helper**: Exported canonical `computeParamsHash` helper from `intention-gate.ts` for unified cross-Pentad intention dispatch verification.
+- **Security Configuration Guards**: Added runtime advisory warnings when loading sensitive HMAC secrets from unencrypted project configuration files rather than environment variables.
+- **Documentation & Manifest Alignment**: Updated security policy contact domains and synchronized package metadata across documentation and schemas.
+
 ## [0.4.0] - 2026-10-02
 
 ### 🚀 Spatial Utility Scoring, Rollout Risk & Affordance Gating

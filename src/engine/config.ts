@@ -63,12 +63,21 @@ export function loadProjectConfig(projectRoot: string): ProjectConfig {
   return config;
 }
 
+let hasWarnedHmacInConfig = false;
+
 export function getPentadHmacSecret(projectRoot = process.cwd()): string | undefined {
   if (process.env.PENTAD_HMAC_SECRET) {
     return process.env.PENTAD_HMAC_SECRET;
   }
   const config = loadProjectConfig(projectRoot);
-  return config.pentadHmacSecret || config.hmacSecret;
+  const secret = config.pentadHmacSecret || config.hmacSecret;
+  if (secret && !hasWarnedHmacInConfig) {
+    logger.warn(
+      'PENTAD_HMAC_SECRET should be supplied via environment variable instead of unencrypted project config file'
+    );
+    hasWarnedHmacInConfig = true;
+  }
+  return secret;
 }
 
 export function getDispatchTokenTtlMs(projectRoot = process.cwd()): number {

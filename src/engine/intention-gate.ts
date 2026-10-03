@@ -15,6 +15,10 @@ import { logReasoningEvent } from './events.js';
 import { generateId } from '../utils/id.js';
 import { canonicalJsonStringify } from '../utils/canonical-json.js';
 
+export function computeParamsHash(params: Record<string, unknown> = {}): string {
+  return crypto.createHash('sha256').update(canonicalJsonStringify(params), 'utf8').digest('hex');
+}
+
 export class IntentionGateEngine {
   static evaluateAndGate(
     db: Database.Database,
@@ -223,10 +227,7 @@ export class IntentionGateEngine {
       const now = Date.now();
       const ttlMs = getDispatchTokenTtlMs();
       const tokenId = generateId();
-      const paramsHash = crypto
-        .createHash('sha256')
-        .update(canonicalJsonStringify(actionParams), 'utf8')
-        .digest('hex');
+      const paramsHash = computeParamsHash(actionParams);
 
       const issuedAt = new Date(now).toISOString();
       const expiresAt = new Date(now + ttlMs).toISOString();
